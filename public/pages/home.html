@@ -1,0 +1,1754 @@
+<!doctype html>
+<html lang="en" class="obfuscate overflow-hidden">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>|Home|</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<script>
+		
+		(function () {
+			var BOOK = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">\ud83d\udcd6</text></svg>');
+			window.__bookIcon = BOOK;
+			var l = document.createElement("link");
+			l.id = "site-icon";
+			l.rel = "icon";
+			l.type = "image/svg+xml";
+			l.href = BOOK;
+			document.head.appendChild(l);
+		})();
+	</script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="/assets/css/font.css?v=2" />
+	<link rel="stylesheet" href="/assets/css/colors/default.css" id="csslink" />
+	<link rel="stylesheet" href="/assets/css/index.css" />
+	<link rel="stylesheet" href="/assets/icons/css/all-pro.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" />
+	<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Share+Tech+Mono&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<style>
+		
+		html { background: #000; }
+		#bgpicker-title { color: #fff; }
+		#clock-splash { position: fixed; inset: 0; z-index: 10000; background: #000; }
+		#clock-splash iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
+		
+		.hometitle, .home-center, #sg-home .hometitle {
+			text-shadow: none !important; filter: none !important; box-shadow: none !important;
+			-webkit-text-stroke: 0 !important; animation: none !important; background-image: none !important;
+		}
+		.hometitle::before, .hometitle::after, .home-center::before, .home-center::after { content: none !important; display: none !important; }
+		nav#navbar, #nav-grip, #dock-guide { display: none !important; }
+
+		#boot-screen {
+			z-index: 9999;
+			background: #000;
+			font-family: 'Share Tech Mono', monospace;
+			transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.5s ease;
+		}
+		#boot-screen.unlocking { transform: translateY(-100%); opacity: 0.5; pointer-events: none; }
+		#boot-screen::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); z-index: 1; }
+		#boot-time { letter-spacing: 2px; text-shadow: 0 0 20px rgba(181, 123, 255, 0.6), 0 0 40px rgba(124, 45, 255, 0.4); }
+		#boot-date { letter-spacing: 1px; }
+		#bg-canvas { background-color: #1c1c1e; z-index: -3; }
+		#bg-overlay { background: rgba(0, 0, 0, 0.35); z-index: -2; }
+		#nexus-bg {
+			z-index: -1; background-color: #0d0d0d;
+			background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1.2px, transparent 1.6px);
+			background-size: 34px 34px; background-position: 17px 17px;
+		}
+
+		.hometitle {
+			font-family: "Orbitron", sans-serif;
+			font-size: clamp(1.5rem, 8vw, 5rem);
+			font-weight: 800;
+			letter-spacing: 2px;
+			color: #b57bff;
+			transition: color 0.25s ease;
+		}
+		.spin-btn { backdrop-filter: blur(6px); transition: 0.2s; }
+		.spin-btn:hover { transform: rotate(45deg); }
+		.color-dot { transition: transform 0.15s, border-color 0.15s; }
+		.color-dot:hover { transform: scale(1.15); }
+		.bgpicker-item .swatch { color: #ff3ec8; transition: 0.15s; }
+		.bgpicker-item:hover .swatch { color: #b57bff; transform: scale(1.08); }
+		.bgpicker-item.selected .swatch { color: #ff3ec8; text-shadow: 0 0 14px rgba(255, 62, 200, 0.85); }
+
+		.toast:not(.show) { display: flex; }
+         body {
+         overflow-x: hidden;
+         background-color: transparent;
+         color: #fff;
+         }
+	</style>
+
+	<style>
+		html, body { height: 100%; }
+		#sg-shell { height: 100vh; height: 100dvh; }
+		#sg-main { min-width: 0; min-height: 0; }
+
+		#sg-rail {
+			z-index: 5; flex-shrink: 0; scrollbar-width: none;
+			background: #161616; border-right: 1px solid #262626;
+		}
+		#sg-rail::-webkit-scrollbar { display: none; }
+		.sg-rail-group { display: flex; flex-direction: row; align-items: center; gap: 4px; }
+		@media (min-width: 768px) {
+			#sg-rail { width: 44px; padding: 10px 0; justify-content: space-between; overflow-y: auto; }
+			.sg-rail-group { flex-direction: column; }
+		}
+		@media (max-width: 767.98px) {
+			#sg-rail {
+				order: 2; justify-content: space-between; overflow-x: auto;
+				height: calc(52px + env(safe-area-inset-bottom)); padding: 0 8px env(safe-area-inset-bottom);
+				border-right: 0; border-top: 1px solid #262626;
+			}
+			.sg-rail-group { gap: 2px; }
+		}
+		.sg-rail-btn {
+			width: 32px; height: 32px; flex-shrink: 0; padding: 0;
+			display: inline-flex; align-items: center; justify-content: center;
+			border: 0; border-radius: 9px; background: transparent; color: #a3a3ab; transition: 0.15s;
+		}
+		.sg-rail-btn svg { width: 16px; height: 16px; }
+		.sg-rail-btn:hover { background: #262626; color: #fff; }
+		.sg-rail-btn.open { color: #e4e4e7; }
+		.sg-rail-btn.active, .sg-rail-btn.active:hover { background: #3a3a3c; color: #fff; }
+		@media (max-width: 767.98px) {
+			#sg-rail { overflow-x: hidden; }
+			.sg-rail-group { flex: 1; justify-content: space-around; gap: 0; }
+			.sg-rail-btn { width: auto; flex: 1 1 0; min-width: 0; max-width: 40px; height: 38px; }
+		}
+
+		#sg-top { background: #0e0e0e; flex-shrink: 0; }
+		#sg-tabs-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px 0; }
+		#sg-tabs { display: flex; gap: 8px; overflow-x: auto; min-width: 0; scrollbar-width: none; }
+		#sg-tabs::-webkit-scrollbar { display: none; }
+		.sg-tab {
+			display: inline-flex; align-items: center; gap: 8px; flex: 0 0 192px; width: 192px; height: 34px;
+			padding: 0 10px; border: 0; border-radius: 12px; background: #1c1c1e; color: #a3a3ab;
+			font-size: 13px; font-weight: 500; text-align: left; transition: background 0.15s, color 0.15s;
+		}
+		.sg-tab:hover { background: #262626; color: #fff; }
+		.sg-tab.active { background: #3a3a3c; color: #fff; }
+		@media (max-width: 575.98px) { .sg-tab { flex-basis: 150px; width: 150px; } }
+		.sg-tab-ico {
+			width: 15px; height: 15px; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,0.12); color: #fff;
+			display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700;
+		}
+		.sg-tab-ico svg { width: 9px; height: 9px; }
+		.sg-tab-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.sg-tab-x {
+			width: 18px; height: 18px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+			border-radius: 6px; opacity: 0.6;
+		}
+		.sg-tab-x svg { width: 11px; height: 11px; }
+		.sg-tab-x:hover { background: rgba(255,255,255,0.15); opacity: 1; }
+		.sg-tab-new {
+			width: 30px; height: 34px; flex-shrink: 0; padding: 0; border: 0; background: transparent; color: #a3a3ab;
+			display: inline-flex; align-items: center; justify-content: center;
+		}
+		.sg-tab-new svg { width: 15px; height: 15px; }
+		.sg-tab-new:hover { color: #fff; }
+
+		#sg-toolbar { display: flex; align-items: center; gap: 0; padding: 8px 10px 8px 12px; }
+		.sg-tb-btn {
+			width: 34px; height: 34px; flex-shrink: 0; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+			border: 0; border-radius: 10px; background: transparent; color: #e4e4e7;
+		}
+		.sg-tb-btn svg { width: 14px; height: 14px; }
+		.sg-tb-btn:hover:not(:disabled) { background: #262626; color: #fff; }
+		.sg-tb-btn:disabled { color: #55555c; }
+		#sg-address-wrap {
+			flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; height: 34px; margin-left: 5px;
+			padding: 0 14px; border-radius: 12px; background: #1c1c1e; border: 1px solid #2a2a2c;
+		}
+		#sg-address-wrap:focus-within { border-color: #6b6b72; }
+		#sg-address-wrap svg { width: 12px; height: 12px; color: #22c55e; flex-shrink: 0; }
+		#sg-address { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: #fff; font-size: 14px; font-weight: 500; }
+
+		#sg-panes {
+			position: relative; flex: 1; min-height: 0; margin: 0; border-radius: 0; overflow: hidden;
+			border: 0; background: transparent;
+		}
+		.sg-pane { position: absolute; inset: 0; display: none; }
+		.sg-pane.active { display: block; }
+		.sg-frame { width: 100%; height: 100%; border: 0; background: #000; display: block; }
+
+		.sg-pane-builtin { background: #000; }
+		.sg-cl { height: 100%; overflow-y: auto; background: #000; color: #fff; font-family: 'Inter', system-ui, sans-serif; }
+		.sg-cl-inner { max-width: 640px; margin: 0 auto; padding: 64px 20px 80px; text-align: center; }
+		.sg-cl-kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.2em; color: #8b8b93; margin-bottom: 14px; }
+		.sg-cl-title { font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: #fff; }
+		.sg-cl-sub { color: #a1a1aa; font-size: 15px; margin: 0 0 40px; }
+		.sg-cl-card { background: #0b0b0d; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 28px 24px; margin-bottom: 18px; }
+		.sg-cl-date { display: inline-block; padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); color: #d4d4d8; font-size: 12px; font-weight: 700; margin-bottom: 14px; }
+		.sg-cl-card h2 { font-size: 20px; font-weight: 700; margin: 0 0 14px; color: #fff; }
+		.sg-cl-list p { margin: 0; padding: 9px 0; color: #d4d4d8; font-size: 15px; line-height: 1.5; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+		.sg-cl-list p:first-child { border-top: 0; }
+	</style>
+
+	<script>
+		(function () {
+			var skip = false;
+			try { skip = window.parent !== window && window.parent.__singularityBooted === true; } catch (e) {}
+			try {
+				if (sessionStorage.getItem("singularity_skip_boot") === "1") {
+					skip = true;
+					sessionStorage.removeItem("singularity_skip_boot");
+				}
+			} catch (e) {}
+			window.__skipBoot = skip;
+			if (skip) document.documentElement.classList.add("skip-boot");
+		})();
+	</script>
+	<style>html.skip-boot #boot-screen { display: none !important; }</style>
+
+	<style>
+		#cloud-ui {
+			--cbg: #050505;
+			--caccent: #ffffff;
+			--cborder: rgba(255,255,255,0.08);
+			position: absolute;
+			inset: 0;
+			z-index: 20;
+			display: none;
+			flex-direction: column;
+			background: var(--cbg);
+			color: #f5f5f7;
+			font-family: 'Inter', system-ui, sans-serif;
+			transition: background 0.4s;
+		}
+		#cloud-ui.open { display: flex; }
+		#cloud-particles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+		#cloud-top-trigger { position: absolute; top: 0; left: 0; width: 100%; height: 14px; z-index: 6; }
+
+		#cloud-hud {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			z-index: 8;
+			transform: translate(-50%, -120%);
+			transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+			background: rgba(22,22,25,0.6);
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			border: 1px solid var(--cborder);
+			border-top: none;
+			border-bottom-left-radius: 18px;
+			border-bottom-right-radius: 18px;
+			padding: 10px 14px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+		#cloud-hud.show { transform: translate(-50%, 0); }
+		.cloud-hud-btn {
+			display: flex; align-items: center; gap: 8px; padding: 8px 22px; border-radius: 100px;
+			background: rgba(255,255,255,0.08); color: #fff; font-size: 13px; font-weight: 600;
+			cursor: pointer; transition: 0.3s; user-select: none; white-space: nowrap;
+		}
+		.cloud-hud-btn svg { stroke: currentColor; }
+		.cloud-hud-btn:hover { background: #fff; color: #000; }
+
+		#cloud-gear {
+			position: absolute; top: 10px; left: 10px; z-index: 7; width: 42px; height: 42px;
+			display: flex; align-items: center; justify-content: center; padding: 0;
+			background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); color: #fff;
+			border: 1px solid rgba(255,255,255,0.25); border-radius: 50%; cursor: pointer; opacity: 0.7;
+			transition: transform 0.4s ease, opacity 0.2s, color 0.2s;
+		}
+		#cloud-gear:hover { opacity: 1; color: var(--caccent); transform: rotate(90deg); }
+
+		#cloud-menu {
+			position: relative;
+			z-index: 2;
+			flex: 1;
+			min-height: 0;
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			gap: 0;
+			padding: 36px 0;
+			flex-wrap: nowrap;
+			overflow-x: auto;
+			overflow-y: hidden;
+			scroll-snap-type: x mandatory;
+			scrollbar-width: none;
+			-ms-overflow-style: none;
+			isolation: isolate;
+		}
+		#cloud-menu::-webkit-scrollbar { display: none; }
+
+		#cloud-menu::before, #cloud-menu::after { content: ""; flex: 0 0 calc(50% - 120px); }
+
+		.cloud-card {
+			position: relative;
+			flex: 0 0 240px;
+			width: 240px;
+			aspect-ratio: 3/4;
+			border-radius: 16px;
+			overflow: hidden;
+			cursor: pointer;
+			border: 1px solid var(--cborder);
+			background: linear-gradient(160deg, #1a1a22, #0b0b0f);
+			scroll-snap-align: center;
+			transform: scale(0.78);
+			transform-origin: center center;
+			transition: transform 0.28s ease, filter 0.28s ease, opacity 0.28s ease, border-color 0.28s ease;
+			z-index: 1;
+			margin-left: -100px;
+			box-shadow: 0 18px 45px rgba(0,0,0,0.55);
+			outline: none;
+		}
+		#cloud-menu::before + .cloud-card, .cloud-card:first-of-type { margin-left: 0; }
+		.cloud-card img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+		.cloud-card img:not([src]) { visibility: hidden; }
+		.cloud-card.cloud-selected {
+			transform: scale(1.08);
+			z-index: 5;
+			border-color: rgba(255,255,255,0.95);
+			box-shadow: 0 22px 65px rgba(0,0,0,0.75), 0 0 24px rgba(255,255,255,0.10);
+		}
+		.cloud-card:not(.cloud-selected) { filter: brightness(0.58) saturate(0.78); opacity: 0.9; }
+		.cloud-card.cloud-before, .cloud-card.cloud-after { z-index: 2; }
+
+		@media (max-width: 700px) {
+			#cloud-menu::before, #cloud-menu::after { flex-basis: calc(50% - 90px); }
+			.cloud-card { flex-basis: 180px; width: 180px; margin-left: -76px; }
+			.cloud-card:first-of-type { margin-left: 0; }
+		}
+
+		.cloud-name {
+			position: absolute; left: 0; bottom: 0; width: 100%; box-sizing: border-box;
+			padding: 40px 20px 20px; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+			font-size: 18px; font-weight: 700; letter-spacing: -0.5px;
+		}
+
+		#cloud-game { position: relative; z-index: 2; flex: 1; min-height: 0; display: none; flex-direction: column; }
+		#cloud-game iframe { flex: 1; min-height: 0; width: 100%; border: none; background: #000; }
+
+		#cloud-settings {
+			position: absolute; inset: 0; z-index: 9; display: none; justify-content: center; align-items: center;
+			background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+		}
+		#cloud-settings.show { display: flex; }
+		.cloud-set-box {
+			background: rgba(22,22,25,0.9); border: 1px solid var(--cborder); border-radius: 24px; padding: 30px;
+			width: 90%; max-width: 560px; max-height: 80vh; overflow-y: auto; box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+		}
+		.cloud-set-box h3 { margin: 0 0 15px 0; font-size: 18px; color: #fff; }
+		.cloud-swatch { width: 44px; height: 44px; border-radius: 12px; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); transition: 0.2s; }
+		.cloud-swatch:hover { transform: scale(1.1); }
+		.cloud-swatch.active { transform: scale(1.15); border-color: #fff; }
+		.cloud-pcard {
+			background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px;
+			text-align: center; cursor: pointer; transition: 0.2s; min-width: 80px; display: flex; flex-direction: column; gap: 8px; align-items: center;
+		}
+		.cloud-pcard:hover { transform: translateY(-3px); background: rgba(255,255,255,0.05); }
+		.cloud-pcard.active { border-color: #fff; }
+		.cloud-pcard span { font-size: 12px; font-weight: 600; color: #fff; }
+		.cloud-pcard svg { stroke: #fff; opacity: 0.8; }
+		.cloud-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 30px; }
+	</style>
+</head>
+
+<body>
+	
+	<div id="clock-splash"><iframe id="clock-splash-frame" src="/pages/clock.html" title="Clock" allow="autoplay; fullscreen"></iframe></div>
+	<script>
+		(function () {
+			var el = document.getElementById("clock-splash");
+			var frame = document.getElementById("clock-splash-frame");
+			window.__clockActive = true;
+
+			var HIDE = "nav#navbar, #nav-grip, #dock-guide { display: none !important; }";
+			function guard() {
+				try {
+					var d = frame.contentDocument;
+					if (!d || !d.documentElement) return;
+					if (!d.getElementById("sg-hide-nav")) {
+						var st = d.createElement("style");
+						st.id = "sg-hide-nav";
+						st.textContent = HIDE;
+						(d.head || d.documentElement).appendChild(st);
+					}
+					d.querySelectorAll("nav#navbar, #nav-grip, #dock-guide").forEach(function (n) { n.style.setProperty("display", "none", "important"); });
+				} catch (e) {}
+			}
+			var guardTimer = setInterval(guard, 20);
+
+			function addBookIcon() {
+				var l = document.createElement("link");
+				l.id = "site-icon";
+				l.rel = "icon";
+				l.type = "image/svg+xml";
+				l.href = window.__bookIcon;
+				document.head.appendChild(l);
+			}
+			var iconObs = new MutationObserver(function () {
+				var ok = false;
+				document.head.querySelectorAll('link[rel~="icon"]').forEach(function (l) {
+					if (l.id === "site-icon") {
+						if (l.getAttribute("href") !== window.__bookIcon) l.setAttribute("href", window.__bookIcon);
+						ok = true;
+					} else {
+						l.remove();
+					}
+				});
+				if (!ok) addBookIcon();
+			});
+			iconObs.observe(document.head, { childList: true, subtree: true, attributes: true, attributeFilter: ["href", "rel"] });
+
+			function finish() {
+				clearInterval(guardTimer);
+				iconObs.disconnect();
+				el.remove();
+				window.__clockActive = false;
+			
+				var old = document.getElementById("site-icon");
+				var icon = document.createElement("link");
+				icon.id = "site-icon";
+				icon.rel = "icon";
+				icon.href = "/assets/img/fav.png";
+				if (old) old.replaceWith(icon); else document.head.appendChild(icon);
+			}
+
+			var started = false;
+			function start() {
+				if (started) return;
+				started = true;
+				setTimeout(finish, 4000);
+			}
+			frame.addEventListener("load", function () { guard(); start(); });
+			setTimeout(start, 4000); 
+		})();
+	</script>
+	<div id="boot-screen" class="position-fixed top-0 start-0 vw-100 vh-100 d-flex flex-column align-items-center justify-content-center overflow-hidden text-white">
+		<video id="boot-video" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover pe-none" src="/assets/video/backgrounds/boot.mp4" autoplay muted loop playsinline tabindex="-1"></video>
+		<div id="boot-time" class="position-relative z-2 display-1">--:--</div>
+		<div id="boot-date" class="position-relative z-2 fs-5 mt-2 opacity-75">Loading...</div>
+	</div>
+
+	<canvas id="bg-canvas" class="position-fixed top-0 start-0 vw-100 vh-100" style="display: none"></canvas>
+	<div id="bg-overlay" class="position-fixed top-0 start-0 vw-100 vh-100"></div>
+	<canvas id="nexus-bg" class="position-fixed top-0 start-0 vw-100 vh-100 pe-none"></canvas>
+
+	<div id="sg-shell" class="d-flex flex-column flex-md-row">
+		<nav id="sg-rail" class="d-flex flex-row flex-md-column align-items-center" aria-label="Apps"></nav>
+
+		<div id="sg-main" class="flex-grow-1 d-flex flex-column">
+			<div id="sg-top">
+				<div id="sg-tabs-row">
+					<div id="sg-tabs" role="tablist"></div>
+					<button id="sg-new-tab" type="button" class="sg-tab-new" title="New tab" aria-label="New tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+				</div>
+				<div id="sg-toolbar">
+					<button id="sg-back" type="button" class="sg-tb-btn" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+					<button id="sg-forward" type="button" class="sg-tb-btn" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+					<button id="sg-reload" type="button" class="sg-tb-btn" title="Reload" aria-label="Reload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
+					<div id="sg-address-wrap">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+						<input id="sg-address" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Address" value="singularity://home">
+					</div>
+				</div>
+			</div>
+
+			<div id="sg-panes">
+				<section id="sg-home" class="sg-pane active">
+
+					<div class="home-center position-absolute top-50 start-50 translate-middle text-center w-100 px-3 z-1">
+						<h1 class="hometitle mb-4 text-break">Singularity</h1>
+					</div>
+
+					<button id="bg-gear" type="button" class="spin-btn btn rounded-circle p-3 lh-1 bg-black bg-opacity-50 text-white border border-light border-opacity-25 position-absolute bottom-0 end-0 m-3 z-3" onclick="openBgPicker()" title="Change background">
+						<i class="fa-solid fa-gear fs-5"></i>
+					</button>
+
+				</section>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="bgpicker-modal" tabindex="-1" aria-labelledby="bgpicker-title" aria-hidden="true" data-bs-theme="dark">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content rounded-4">
+				<div class="modal-header flex-wrap gap-2">
+					<h2 class="modal-title fs-5" id="bgpicker-title">Choose A Background</h2>
+					<div class="d-flex align-items-center gap-2 ms-auto" id="color-dots"></div>
+				</div>
+				<div class="modal-body">
+					<button type="button" class="btn btn-outline-secondary btn-sm mb-3" onclick="resetBackground()">Reset to default</button>
+					<div class="row row-cols-2 row-cols-sm-3 g-2" id="bgpicker-results">
+						<div class="col-12 text-center text-secondary small py-4">No Backgrounds Available</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="/assets/js/cursor.js"></script>
+
+
+	<script>
+		
+		const store = {
+			get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+			set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+			remove(k) { try { localStorage.removeItem(k); } catch (e) {} },
+		};
+	</script>
+
+	<script>
+		(function () {
+			if (window.__skipBoot) {
+				const v = document.getElementById("boot-video");
+				if (v) { v.pause(); v.removeAttribute("src"); v.load(); }
+				try { window.parent.postMessage({ type: "singularity-boot", show: false }, "*"); } catch (e) {}
+				return;
+			}
+			const bootVideoEl = document.getElementById("boot-video");
+			bootVideoEl.muted = true;
+			bootVideoEl.play().catch(() => {});
+
+			function notifyParent(show) {
+				if (window.parent && window.parent !== window) {
+					try { window.parent.postMessage({ type: "singularity-boot", show }, "*"); } catch (e) {}
+				}
+			}
+			notifyParent(true);
+
+			const timeEl = document.getElementById("boot-time");
+			const dateEl = document.getElementById("boot-date");
+
+			function updateBootClock() {
+				const now = new Date();
+				timeEl.textContent = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+				dateEl.textContent = now.toLocaleDateString([], { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+			}
+			updateBootClock();
+			const bootClockInterval = setInterval(updateBootClock, 1000);
+
+			function dismissBootScreen() {
+				if (window.__clockActive) return;
+				const bootEl = document.getElementById("boot-screen");
+				bootEl.classList.add("unlocking");
+				clearInterval(bootClockInterval);
+				notifyParent(false);
+				try { window.parent.__singularityBooted = true; } catch (e) {}
+
+				document.removeEventListener("click", dismissBootScreen);
+				document.removeEventListener("keydown", dismissBootScreen);
+				document.removeEventListener("touchstart", dismissBootScreen);
+
+				setTimeout(() => {
+					bootEl.style.display = "none";
+					bootVideoEl.pause();
+					bootVideoEl.removeAttribute("src");
+					bootVideoEl.load();
+				}, 700);
+			}
+			document.addEventListener("click", dismissBootScreen);
+			document.addEventListener("keydown", dismissBootScreen);
+			document.addEventListener("touchstart", dismissBootScreen);
+		})();
+	</script>
+
+	<script>
+		
+		let nexusCanvas = null, nexusCtx = null, nexusRaf = null, nexusPts = [], nexusW = 0, nexusH = 0;
+		let nexusBound = false;
+		const NEXUS_LINK = 110;
+
+		function nexusResize() {
+			if (!nexusCanvas) return;
+			const dpr = window.devicePixelRatio || 1;
+			nexusW = window.innerWidth;
+			nexusH = window.innerHeight;
+			nexusCanvas.width = nexusW * dpr;
+			nexusCanvas.height = nexusH * dpr;
+			nexusCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			const count = Math.max(25, Math.min(90, Math.floor((nexusW * nexusH) / 16000)));
+			nexusPts = Array.from({ length: count }, () => ({
+				x: Math.random() * nexusW,
+				y: Math.random() * nexusH,
+				vx: (Math.random() - 0.5) * 0.7,
+				vy: (Math.random() - 0.5) * 0.7,
+			}));
+		}
+
+		function nexusDraw() {
+			nexusRaf = requestAnimationFrame(nexusDraw);
+			const ctx = nexusCtx;
+			ctx.clearRect(0, 0, nexusW, nexusH);
+
+			for (const p of nexusPts) {
+				p.x += p.vx;
+				p.y += p.vy;
+				if (p.x < 0 || p.x > nexusW) p.vx *= -1;
+				if (p.y < 0 || p.y > nexusH) p.vy *= -1;
+			}
+
+			ctx.lineWidth = 1;
+			for (let i = 0; i < nexusPts.length; i++) {
+				const p = nexusPts[i];
+				for (let j = i + 1; j < nexusPts.length; j++) {
+					const q = nexusPts[j];
+					const d = Math.hypot(p.x - q.x, p.y - q.y);
+					if (d < NEXUS_LINK) {
+						ctx.strokeStyle = "rgba(255,255,255," + ((1 - d / NEXUS_LINK) * 0.55).toFixed(3) + ")";
+						ctx.beginPath();
+						ctx.moveTo(p.x, p.y);
+						ctx.lineTo(q.x, q.y);
+						ctx.stroke();
+					}
+				}
+			}
+
+			ctx.fillStyle = "rgba(255,255,255,0.6)";
+			for (const p of nexusPts) {
+				ctx.beginPath();
+				ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+				ctx.fill();
+			}
+		}
+
+		function startDefaultBg() {
+			if (nexusRaf) return;
+			nexusCanvas = document.getElementById("nexus-bg");
+			nexusCtx = nexusCanvas.getContext("2d");
+			nexusCanvas.style.display = "block";
+			nexusResize();
+			if (!nexusBound) {
+				nexusBound = true;
+				window.addEventListener("resize", nexusResize);
+			}
+			nexusRaf = requestAnimationFrame(nexusDraw);
+		}
+
+		function stopDefaultBg() {
+			if (nexusRaf) { cancelAnimationFrame(nexusRaf); nexusRaf = null; }
+			const c = document.getElementById("nexus-bg");
+			if (c) c.style.display = "none";
+		}
+	</script>
+
+	<script>
+		const VIDEO_DIR = "/assets/video/backgrounds/";
+
+		function videoSources(file) {
+			const m = file.match(/^(.*)\.mp4$/i);
+			const names = m ? [file, m[1] + ".mp4", m[1] + ".MP4", m[1].toLowerCase() + ".mp4", m[1].toLowerCase() + ".MP4"] : [file];
+			return Array.from(new Set(names)).map((n) => VIDEO_DIR + n);
+		}
+
+		function createVideoBackground(sources, loop = true) {
+			const video = document.createElement("video");
+			let i = 0;
+			video.autoplay = true;
+			video.muted = true;
+			video.loop = loop;
+			video.playsInline = true;
+			video.setAttribute("tabindex", "-1");
+			video.className = "position-fixed top-0 start-0 vw-100 vh-100 object-fit-cover pe-none";
+			video.style.zIndex = "-3";
+			video.addEventListener("error", () => {
+				i++;
+				if (i < sources.length) { video.src = sources[i]; video.play().catch(() => {}); }
+				else console.warn("Background video failed to load:", sources);
+			});
+			video.src = sources[0];
+			document.body.appendChild(video);
+			video.play().catch(() => {});
+			return function stop() { video.pause(); video.remove(); };
+		}
+
+		const videoBg = (id, name, file, loop = true) => ({
+			id, name, type: "video", sources: videoSources(file),
+			start() { return createVideoBackground(this.sources, loop); },
+		});
+
+		const CODED_BACKGROUNDS = [
+			{ ...videoBg("waves", "Waves", "waves.mp4"), swatchColors: ["#7c2dff", "#ff3ec8"] },
+			videoBg("Winter", "Winter", "winter.mp4"),
+			videoBg("f-1", "F-1", "f-1.mp4"),
+			videoBg("cherri", "Cherri", "cherri.mp4"),
+			videoBg("Halloween", "Halloween", "Halloween.mp4"),
+			videoBg("Skello", "Skello", "skello.MP4", false),
+			videoBg("Hide", "Hide", "hide.mp4", false),
+			videoBg("Void", "Void", "void.mp4"),
+			videoBg("cine", "Cine", "cine.mp4"),
+			videoBg("spooky", "Spooky", "spooky.mp4"),
+			{
+				id: "desolation",
+				name: "Desolation",
+				swatchColors: ["#1b3fd9", "#6d28d9"],
+				start(canvas) {
+					const ctx = canvas.getContext("2d");
+					let width, height, frameId, gradient, vignette;
+					let orbs = [];
+
+					function makeOrb(anywhere) {
+						return {
+							x: Math.random() * width,
+							y: anywhere ? Math.random() * height : height + Math.random() * 30,
+							r: Math.random() * 2.2 + 0.8,
+							vy: -(Math.random() * 0.7 + 0.25),
+							vx: (Math.random() - 0.5) * 1.2,
+							opacity: Math.random() * 0.5 + 0.4,
+						};
+					}
+
+					function resize() {
+						width = canvas.width = canvas.clientWidth || window.innerWidth;
+						height = canvas.height = canvas.clientHeight || window.innerHeight;
+						gradient = ctx.createLinearGradient(0, 0, 0, height);
+						gradient.addColorStop(0, "#1b3fd9");
+						gradient.addColorStop(0.5, "#6d28d9");
+						gradient.addColorStop(1, "#2a1066");
+						vignette = ctx.createRadialGradient(width / 2, height * 0.3, Math.min(width, height) * 0.2, width / 2, height * 0.3, Math.max(width, height) * 0.85);
+						vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+						vignette.addColorStop(1, "rgba(0, 0, 0, 0.5)");
+						const count = Math.floor((width * height) / 9000);
+						orbs = Array.from({ length: count }, () => makeOrb(true));
+					}
+					resize();
+					window.addEventListener("resize", resize);
+
+					function draw() {
+						ctx.fillStyle = gradient;
+						ctx.fillRect(0, 0, width, height);
+						ctx.fillStyle = vignette;
+						ctx.fillRect(0, 0, width, height);
+						ctx.shadowColor = "rgba(200, 215, 255, 1)";
+						ctx.shadowBlur = 18;
+
+						for (let i = 0; i < orbs.length; i++) {
+							let o = orbs[i];
+							o.vx += (Math.random() - 0.5) * 0.08;
+							o.vx = Math.max(-1, Math.min(1, o.vx));
+							o.x += o.vx;
+							o.y += o.vy;
+							if (o.x < -10) o.x = width + 10;
+							if (o.x > width + 10) o.x = -10;
+							if (o.y < -10) { o = orbs[i] = makeOrb(false); } 
+
+							ctx.beginPath();
+							ctx.globalAlpha = o.opacity;
+							ctx.fillStyle = "#ffffff";
+							ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+							ctx.fill();
+						}
+						ctx.globalAlpha = 1;
+						ctx.shadowBlur = 0;
+						frameId = requestAnimationFrame(draw);
+					}
+					draw();
+
+					return function stop() {
+						cancelAnimationFrame(frameId);
+						window.removeEventListener("resize", resize);
+					};
+				},
+			},
+			{
+				id: "rain",
+				name: "Rain",
+				swatchColors: ["#3a4a5a", "#8fa8c2"],
+				start(canvas) {
+					const ctx = canvas.getContext("2d");
+					let width, height, frameId;
+					let drops = [];
+
+					function resize() {
+						width = canvas.width = canvas.clientWidth || window.innerWidth;
+						height = canvas.height = canvas.clientHeight || window.innerHeight;
+						const count = Math.floor((width * height) / 9000);
+						drops = Array.from({ length: count }, () => ({
+							x: Math.random() * width,
+							y: Math.random() * height,
+							len: Math.random() * 18 + 10,
+							speed: Math.random() * 6 + 6,
+							opacity: Math.random() * 0.4 + 0.2,
+						}));
+					}
+					resize();
+					window.addEventListener("resize", resize);
+
+					function draw() {
+						ctx.fillStyle = "#0d1117";
+						ctx.fillRect(0, 0, width, height);
+						drops.forEach((d) => {
+							ctx.beginPath();
+							ctx.globalAlpha = d.opacity;
+							ctx.strokeStyle = "rgba(180, 200, 220, 0.9)";
+							ctx.lineWidth = 1;
+							ctx.moveTo(d.x, d.y);
+							ctx.lineTo(d.x, d.y + d.len);
+							ctx.stroke();
+							d.y += d.speed;
+							if (d.y > height) { d.y = -d.len; d.x = Math.random() * width; }
+						});
+						ctx.globalAlpha = 1;
+						frameId = requestAnimationFrame(draw);
+					}
+					draw();
+
+					return function stop() {
+						cancelAnimationFrame(frameId);
+						window.removeEventListener("resize", resize);
+					};
+				},
+			},
+		];
+
+		const TITLE_COLORS = [
+			{ id: "red", label: "Red", color: "#ff6b6b", glow: ["#ff6b6b", "#ff2d2d", "#c40000"] },
+			{ id: "blue", label: "Blue", color: "#6bb8ff", glow: ["#6bb8ff", "#2f8cff", "#1a56d6"] },
+			{ id: "yellow", label: "Yellow", color: "#ffe066", glow: ["#ffe066", "#ffcc1f", "#d99a00"] },
+			{ id: "green", label: "Green", color: "#6bff9e", glow: ["#6bff9e", "#2fdc6b", "#12a84a"] },
+			{ id: "purple", label: "Purple", color: "#b57bff", glow: ["#b57bff", "#9146ff", "#7c2dff"] },
+		];
+
+		const TITLE_COLOR_KEY = "singularity_titleColor";
+		const DEFAULT_TITLE_COLOR = "purple";
+		const titleEl = document.querySelector(".hometitle");
+		const colorDotsEl = document.getElementById("color-dots");
+
+		function getTitleColorId() {
+			const saved = store.get(TITLE_COLOR_KEY);
+			return TITLE_COLORS.some((c) => c.id === saved) ? saved : DEFAULT_TITLE_COLOR;
+		}
+
+		function applyTitleColor(id) {
+			const entry = TITLE_COLORS.find((c) => c.id === id);
+			if (!entry || !titleEl) return;
+			titleEl.style.color = entry.color;
+		}
+
+		function renderColorDots() {
+			colorDotsEl.innerHTML = "";
+			const currentId = getTitleColorId();
+			TITLE_COLORS.forEach((c) => {
+				const dot = document.createElement("button");
+				dot.type = "button";
+				dot.className = "color-dot btn rounded-circle p-2 border border-2 " + (c.id === currentId ? "border-white" : "border-light border-opacity-25");
+				dot.style.background = c.color;
+				dot.title = c.label;
+				dot.setAttribute("aria-label", c.label);
+				dot.onclick = () => {
+					store.set(TITLE_COLOR_KEY, c.id);
+					applyTitleColor(c.id);
+					renderColorDots();
+				};
+				colorDotsEl.appendChild(dot);
+			});
+		}
+
+		const bgCanvasEl = document.getElementById("bg-canvas");
+		const bgModalEl = document.getElementById("bgpicker-modal");
+		const resultsEl = document.getElementById("bgpicker-results");
+		let stopCurrentBackground = null;
+
+		function applyCodedBackground(id) {
+			if (stopCurrentBackground) { stopCurrentBackground(); stopCurrentBackground = null; }
+			bgCanvasEl.style.display = "none";
+
+			const entry = id && CODED_BACKGROUNDS.find((b) => b.id === id);
+			if (!entry) {
+				store.remove("singularity_bgCoded");
+				startDefaultBg();
+				return;
+			}
+
+			stopDefaultBg();
+			if (entry.type === "video") {
+				stopCurrentBackground = entry.start();
+			} else {
+				bgCanvasEl.style.display = "block";
+				stopCurrentBackground = entry.start(bgCanvasEl);
+      }
+			store.set("singularity_bgCoded", id);
+		}
+
+		function resetBackground() {
+			applyCodedBackground(null);
+			renderPickerList();
+			closeBgPicker();
+		}
+
+		function renderPickerList() {
+			resultsEl.innerHTML = "";
+			if (CODED_BACKGROUNDS.length === 0) {
+				resultsEl.innerHTML = '<div class="col-12 text-center text-secondary small py-4">No backgrounds yet.</div>';
+				return;
+			}
+			const currentId = store.get("singularity_bgCoded");
+			CODED_BACKGROUNDS.forEach((item) => {
+				const col = document.createElement("div");
+				col.className = "col";
+				const wrap = document.createElement("button");
+				wrap.type = "button";
+				wrap.className = "bgpicker-item btn btn-link w-100 p-0 d-flex flex-column align-items-center text-decoration-none" + (item.id === currentId ? " selected" : "");
+				const swatch = document.createElement("div");
+				swatch.className = "swatch py-3 fs-2";
+				swatch.innerHTML = '<i class="fas fa-image"></i>';
+				const label = document.createElement("span");
+				label.className = "small text-light";
+				label.textContent = item.name;
+				wrap.appendChild(swatch);
+				wrap.appendChild(label);
+				wrap.onclick = () => { applyCodedBackground(item.id); renderPickerList(); closeBgPicker(); };
+				col.appendChild(wrap);
+				resultsEl.appendChild(col);
+			});
+		}
+
+		function openBgPicker() {
+			renderPickerList();
+			renderColorDots();
+			bootstrap.Modal.getOrCreateInstance(bgModalEl).show();
+		}
+		function closeBgPicker() { bootstrap.Modal.getOrCreateInstance(bgModalEl).hide(); }
+
+		const savedCodedBg = store.get("singularity_bgCoded");
+		if (savedCodedBg) applyCodedBackground(savedCodedBg);
+		else startDefaultBg();
+
+
+
+		const CLOUD_GAMES = [
+			{ name: "Grand Theft Auto V", wiki: "Grand_Theft_Auto_V", url: "https://v2.fiveplay.lol/game.html" },
+			{ name: "Deltarune", wiki: "Deltarune", url: "https://deltarune-blue.vercel.app/" },
+			{ name: "Minecraft", wiki: "Minecraft", url: "https://eaglercraftnoa.github.io/version/eaglercraft-26.2.html" },
+			{ name: "Ultimate Custom Night", wiki: "Ultimate_Custom_Night", url: "https://sussygamedeveloper.github.io/UCN-HTML5/" },
+			{ name: "Five Nights at Freddy's 3", wiki: "Five_Nights_at_Freddy%27s_3", url: "https://sussygamedeveloper.github.io/fnaf3/" },
+			{ name: "Sonic Mania", wiki: "Sonic_Mania", url: "https://sonicmania-two.vercel.app/" },
+		];
+
+		const CLOUD_THEMES = {
+			dark: ["#050505", "#ffffff", "rgba(255,255,255,0.08)", "#050505"],
+			figure: ["#0c0202", "#ff3333", "rgba(255,50,50,0.15)", "#ff4d4d"],
+			neon: ["#020b14", "#00d2ff", "rgba(0,210,255,0.15)", "#00d2ff"],
+			forest: ["#010f08", "#05c46b", "rgba(5,196,107,0.15)", "#05c46b"],
+			sunset: ["#120410", "#f53b57", "rgba(245,59,87,0.15)", "#f53b57"],
+			amethyst: ["#0a0310", "#a55eea", "rgba(165,94,234,0.15)", "#a55eea"],
+			gold: ["#0f0e05", "#f1c40f", "rgba(241,196,15,0.15)", "#f1c40f"],
+			hacker: ["#020802", "#00ff00", "rgba(0,255,0,0.15)", "#00ff00"],
+			ocean: ["#020914", "#0abde3", "rgba(10,189,227,0.15)", "#0abde3"],
+			lava: ["#140402", "#ee5253", "rgba(238,82,83,0.15)", "#ee5253"],
+			cyberp: ["#110214", "#D980FA", "rgba(217,128,250,0.15)", "#D980FA"],
+			ice: ["#050a0f", "#c8d6e5", "rgba(200,214,229,0.15)", "#c8d6e5"],
+			rose: ["#14020a", "#f368e0", "rgba(243,104,224,0.15)", "#f368e0"],
+			mint: ["#02140d", "#1dd1a1", "rgba(29,209,161,0.15)", "#1dd1a1"],
+			crimson: ["#140101", "#c23616", "rgba(194,54,22,0.15)", "#c23616"],
+		};
+
+		const CLOUD_PARTICLES = [
+			["none", "None", '<circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>'],
+			["snow", "Snow", '<line x1="12" y1="2" x2="12" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="12" x2="19" y2="19"></line><line x1="12" y1="12" x2="5" y2="5"></line><line x1="12" y1="12" x2="19" y2="5"></line><line x1="12" y1="12" x2="5" y2="19"></line>'],
+			["rain", "Rain", '<line x1="16" y1="13" x2="16" y2="21"></line><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path>'],
+			["stars", "Stars", '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>'],
+			["cyber", "Cyber", '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>'],
+			["matrix", "Matrix", '<path d="M4 17l6-6-6-6"></path><path d="M12 19h8"></path>'],
+			["bubbles", "Bubbles", '<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle>'],
+			["fireflies", "Fireflies", '<circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"></path>'],
+			["nexus", "Nexus", '<circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="6" r="3"></circle><line x1="8" y1="8" x2="16" y2="16"></line><line x1="8" y1="16" x2="16" y2="8"></line>'],
+		];
+
+		let cloudTheme = store.get("cloud_theme") || "dark";
+		if (!CLOUD_THEMES[cloudTheme]) cloudTheme = "dark";
+		let cpType = store.get("cloud_particles") || "none";
+		if (!CLOUD_PARTICLES.some((p) => p[0] === cpType)) cpType = "none";
+		const cloudW = () => { const u = document.getElementById("cloud-ui"); return (u && u.clientWidth) || window.innerWidth; };
+		const cloudH = () => { const u = document.getElementById("cloud-ui"); return (u && u.clientHeight) || window.innerHeight; };
+		let cpArr = [], cpCanvas = null, cpCtx = null, cpRaf = null, cpMX = -9999, cpMY = -9999;
+
+		const COVER_OVERRIDES = {
+			"Deltarune": [
+				"https://cdn.akamai.steamstatic.com/steam/apps/1671210/library_600x900.jpg",
+				"https://cdn.cloudflare.steamstatic.com/steam/apps/1671210/library_600x900.jpg",
+			],
+			"Minecraft": ["https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png"],
+		};
+
+		function tryImageSources(img, sources, onAllFailed) {
+			let i = 0;
+			img.onerror = () => {
+				i++;
+				if (i < sources.length) img.src = sources[i];
+				else { img.onerror = null; img.removeAttribute("src"); if (onAllFailed) onAllFailed(); }
+			};
+			img.src = sources[0];
+		}
+
+		async function loadCloudCover(g, img) {
+			img.referrerPolicy = "no-referrer";
+			if (COVER_OVERRIDES[g.wiki]) { tryImageSources(img, COVER_OVERRIDES[g.wiki]); return; }
+
+			const key = "cloud_cover_" + g.wiki;
+			const cached = store.get(key);
+			if (cached) {
+				tryImageSources(img, [cached], () => store.remove(key));
+				return;
+			}
+			try {
+				const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + g.wiki);
+				if (!r.ok) return;
+				const d = await r.json();
+				const src = (d.originalimage && d.originalimage.source) || (d.thumbnail && d.thumbnail.source);
+				if (src) { tryImageSources(img, [src]); store.set(key, src); }
+			} catch (e) {}
+		}
+
+		function setCloudTheme(t) {
+			const th = CLOUD_THEMES[t] || CLOUD_THEMES.dark;
+			const ui = document.getElementById("cloud-ui");
+			ui.style.setProperty("--cbg", th[0]);
+			ui.style.setProperty("--caccent", th[1]);
+			ui.style.setProperty("--cborder", th[2]);
+			cloudTheme = t;
+			store.set("cloud_theme", t);
+			ui.querySelectorAll(".cloud-swatch").forEach((e) => e.classList.toggle("active", e.dataset.theme === t));
+		}
+
+		let cmWidth = 0, cmHeight = 0, cmColumns = 0, cmDrops = [], cmInterval = null;
+		const cmFontSize = 16;
+
+		function cpResize() {
+			if (!cpCanvas) return;
+			cpCtx = cpCanvas.getContext("2d");
+			if (cpType === "matrix") {
+				cpCanvas.style.mixBlendMode = "screen";
+				cpCanvas.style.width = "";
+				cpCanvas.style.height = "";
+				cmWidth = cpCanvas.width = cloudW();
+				cmHeight = cpCanvas.height = cloudH();
+				cmColumns = Math.floor(cmWidth / cmFontSize);
+				cmDrops = new Array(cmColumns).fill(0).map(() => Math.random() * -100);
+				cpArr = [];
+				return;
+			}
+			cpCanvas.style.mixBlendMode = "";
+			const dpr = window.devicePixelRatio || 1;
+			cpCanvas.width = cloudW() * dpr;
+			cpCanvas.height = cloudH() * dpr;
+			cpCanvas.style.width = cloudW() + "px";
+			cpCanvas.style.height = cloudH() + "px";
+			cpCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			cpInit();
+		}
+
+		function cloudMatrixDraw() {
+			const ui = document.getElementById("cloud-ui");
+			if (!ui || !ui.classList.contains("open") || cpType !== "matrix") { cloudMatrixStop(); return; }
+			cpCtx.fillStyle = "rgba(0, 0, 0, 0.08)";
+			cpCtx.fillRect(0, 0, cmWidth, cmHeight);
+			cpCtx.font = cmFontSize + "px monospace";
+			for (let i = 0; i < cmColumns; i++) {
+				const char = Math.random() > 0.5 ? "1" : "0";
+				const x = i * cmFontSize;
+				const y = cmDrops[i] * cmFontSize;
+				cpCtx.fillStyle = Math.random() > 0.95 ? "#aaffaa" : "#00ff00";
+				cpCtx.fillText(char, x, y);
+				if (y > cmHeight && Math.random() > 0.975) cmDrops[i] = 0;
+				cmDrops[i]++;
+			}
+		}
+		function cloudMatrixStart() { if (cmInterval || cpType !== "matrix") return; cmInterval = setInterval(cloudMatrixDraw, 45); }
+		function cloudMatrixStop() { if (cmInterval) { clearInterval(cmInterval); cmInterval = null; } }
+
+		function cpInit() {
+			cpArr = [];
+			if (cpType === "none" || cpType === "matrix") return;
+			const cnt = (cpType === "snow" || cpType === "rain") ? 80 : (cpType === "fireflies" || cpType === "nexus") ? 60 : 30;
+			const rnd = Math.random;
+			for (let i = 0; i < cnt; i++) {
+				cpArr.push({
+					x: rnd() * cloudW(),
+					y: rnd() * cloudH(),
+					r: cpType === "snow" ? rnd() * 2 + 1 : cpType === "stars" ? rnd() * 1.5 + 0.5 : cpType === "bubbles" ? rnd() * 4 + 2 : cpType === "fireflies" ? rnd() * 2 + 1.5 : 2,
+					vy: cpType === "snow" ? rnd() + 0.5 : cpType === "rain" ? rnd() * 15 + 10 : cpType === "bubbles" ? -(rnd() * 2 + 1) : cpType === "fireflies" ? rnd() * 2 - 1 : cpType === "nexus" ? rnd() - 0.5 : 0,
+					vx: cpType === "snow" ? rnd() * 0.8 - 0.4 : cpType === "cyber" ? rnd() * 5 + 3 : cpType === "bubbles" ? rnd() - 0.5 : cpType === "fireflies" ? rnd() * 2 - 1 : cpType === "nexus" ? rnd() - 0.5 : 0,
+					l: cpType === "rain" ? rnd() * 20 + 10 : cpType === "cyber" ? rnd() * 50 + 20 : 0,
+					c: cpType === "cyber" ? "rgba(0,210,255,0.4)" : cpType === "stars" ? "#fff" : cpType === "bubbles" ? "rgba(255,255,255,0.2)" : cpType === "fireflies" ? "rgba(255,255,100,0.8)" : cpType === "nexus" ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.5)",
+					o: 0.1 + rnd() * 0.9,       
+					do: rnd() * 0.02 + 0.01,
+				});
+			}
+		}
+
+		function cpFrame() {
+			const ui = document.getElementById("cloud-ui");
+			if (!ui || !ui.classList.contains("open")) { cpRaf = null; return; }
+			cpRaf = requestAnimationFrame(cpFrame);
+			if (!cpCtx || cpType === "matrix") return;
+			cpCtx.clearRect(0, 0, cloudW(), cloudH());
+			if (cpType === "none") return;
+
+			const W = cloudW(), H = cloudH();
+			cpArr.forEach((p) => {
+				cpCtx.beginPath();
+				if (cpType === "rain" || cpType === "cyber") {
+					cpCtx.rect(p.x, p.y, cpType === "rain" ? 1 : p.l, cpType === "rain" ? p.l : 1);
+					cpCtx.fillStyle = p.c;
+				} else {
+					cpCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+					cpCtx.fillStyle = p.c;
+					if (cpType === "bubbles") { cpCtx.strokeStyle = "rgba(255,255,255,0.4)"; cpCtx.stroke(); cpCtx.fillStyle = "transparent"; }
+				}
+				if (cpType === "stars" || cpType === "fireflies") {
+					p.o += p.do;
+					if (p.o >= 1) p.do = -Math.abs(p.do);
+					else if (p.o <= 0.1) p.do = Math.abs(p.do);
+					cpCtx.globalAlpha = Math.max(0.1, Math.min(1, p.o));
+				}
+				cpCtx.fill();
+				cpCtx.globalAlpha = 1;
+
+				if (cpType === "fireflies") {
+					const dx = cpMX - p.x, dy = cpMY - p.y;
+					if (Math.hypot(dx, dy) < 100) { p.vx -= dx * 0.005; p.vy -= dy * 0.005; }
+					p.vx += (Math.random() - 0.5) * 0.1;
+					p.vy += (Math.random() - 0.5) * 0.1;
+					const s = Math.hypot(p.vx, p.vy);
+					if (s > 1.5) { p.vx *= 1.5 / s; p.vy *= 1.5 / s; }
+				}
+				if (cpType === "nexus") {
+					const dx = cpMX - p.x, dy = cpMY - p.y;
+					if (Math.hypot(dx, dy) < 150) { p.x -= dx * 0.02; p.y -= dy * 0.02; }
+					cpArr.forEach((p2) => {
+						const d2 = Math.hypot(p2.x - p.x, p2.y - p.y);
+						if (d2 < 80) {
+							cpCtx.beginPath();
+							cpCtx.moveTo(p.x, p.y);
+							cpCtx.lineTo(p2.x, p2.y);
+							cpCtx.strokeStyle = `rgba(255,255,255,${1 - d2 / 80})`;
+							cpCtx.stroke();
+						}
+					});
+				}
+
+				p.x += p.vx;
+				p.y += p.vy;
+				if (cpType === "snow" || cpType === "rain") { if (p.y > H) { p.y = -20; p.x = Math.random() * W; } }
+				else if (cpType === "cyber") { if (p.x > W) { p.x = -100; p.y = Math.random() * H; } }
+				else if (cpType === "bubbles") { if (p.y < 0) { p.y = H + 20; p.x = Math.random() * W; } }
+				else if (cpType === "fireflies" || cpType === "nexus") {
+					if (p.x < 0 || p.x > W) p.vx *= -1;
+					if (p.y < 0 || p.y > H) p.vy *= -1;
+				}
+			});
+		}
+
+		function setCloudParticles(t) {
+			cloudMatrixStop();
+			cpType = t;
+			store.set("cloud_particles", t);
+			cpResize();
+			cloudMatrixStart();
+			document.querySelectorAll(".cloud-pcard[data-p]").forEach((e) => e.classList.toggle("active", e.dataset.p === t));
+		}
+
+		function toggleCloudSettings(force) {
+			const el = document.getElementById("cloud-settings");
+			const show = typeof force === "boolean" ? force : !el.classList.contains("show");
+			el.classList.toggle("show", show);
+		}
+
+		
+		let cloudCards = [], cloudSelectedIndex = 0, cloudScrollLock = false, cloudScrollTimer = null, cloudLockTimer = null;
+
+		function cloudInGame() {
+			const g = document.getElementById("cloud-game");
+			return !!g && g.style.display === "flex";
+		}
+
+		function selectCloudCard(index, opts) {
+			if (!cloudCards.length) return;
+			const o = Object.assign({ scroll: true, focus: true }, opts);
+			cloudSelectedIndex = (index + cloudCards.length) % cloudCards.length;
+			cloudCards.forEach((card, i) => {
+				card.classList.toggle("cloud-selected", i === cloudSelectedIndex);
+				card.classList.toggle("cloud-before", i < cloudSelectedIndex);
+				card.classList.toggle("cloud-after", i > cloudSelectedIndex);
+			});
+			const card = cloudCards[cloudSelectedIndex];
+			if (o.focus) card.focus({ preventScroll: true });
+			if (o.scroll) {
+			
+				cloudScrollLock = true;
+				clearTimeout(cloudLockTimer);
+				cloudLockTimer = setTimeout(() => { cloudScrollLock = false; }, 500);
+				card.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+			}
+		}
+
+		function selectNearestCloudCard() {
+			const menu = document.getElementById("cloud-menu");
+			if (!menu || cloudScrollLock || !cloudCards.length) return;
+			const mid = menu.scrollLeft + menu.clientWidth / 2;
+			let best = 0, bestDist = Infinity;
+			cloudCards.forEach((c, i) => {
+				const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+				if (d < bestDist) { bestDist = d; best = i; }
+			});
+			if (best !== cloudSelectedIndex) selectCloudCard(best, { scroll: false, focus: false });
+		}
+
+		function buildCloudUI() {
+			const ui = document.createElement("div");
+			ui.id = "cloud-ui";
+			ui.innerHTML =
+				'<canvas id="cloud-particles"></canvas>' +
+				'<button id="cloud-gear" type="button" title="Settings"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>' +
+				'<div id="cloud-top-trigger"></div>' +
+				'<div id="cloud-hud">' +
+					'<div class="cloud-hud-btn" id="cloud-back" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Games</div>' +
+					'<div class="cloud-hud-btn" id="cloud-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>Close</div>' +
+				'</div>' +
+				'<div id="cloud-menu"></div>' +
+				'<div id="cloud-game"><iframe id="cloud-frame" allow="autoplay; fullscreen; pointer-lock; gamepad; keyboard-map; clipboard-read; clipboard-write"></iframe></div>' +
+				'<div id="cloud-settings"><div class="cloud-set-box">' +
+					'<h3>Themes</h3><div class="cloud-row" id="cloud-swatches"></div>' +
+					'<h3>Particles</h3><div class="cloud-row" id="cloud-pcards" style="margin-bottom:0"></div>' +
+				'</div></div>';
+			document.getElementById("sg-panes").appendChild(ui);
+
+			cpCanvas = ui.querySelector("#cloud-particles");
+			cpCtx = cpCanvas.getContext("2d");
+			window.addEventListener("resize", cpResize);
+			window.addEventListener("mousemove", (e) => { cpMX = e.clientX; cpMY = e.clientY; });
+
+			const menu = ui.querySelector("#cloud-menu");
+			CLOUD_GAMES.forEach((g) => {
+				const card = document.createElement("div");
+				card.className = "cloud-card";
+				card.setAttribute("tabindex", "0");
+				card.setAttribute("role", "button");
+				card.setAttribute("aria-label", g.name);
+				const img = document.createElement("img");
+				img.alt = "";
+				img.draggable = false;
+				const name = document.createElement("div");
+				name.className = "cloud-name";
+				name.textContent = g.name;
+				card.appendChild(img);
+				card.appendChild(name);
+				menu.appendChild(card);
+				loadCloudCover(g, img);
+			});
+
+			
+			cloudCards = Array.from(menu.querySelectorAll(".cloud-card"));
+			cloudCards.forEach((card, index) => {
+				card.addEventListener("click", () => {
+					
+					if (index !== cloudSelectedIndex) selectCloudCard(index);
+					else launchCloudGame(CLOUD_GAMES[index]);
+				});
+				card.addEventListener("dblclick", () => launchCloudGame(CLOUD_GAMES[index]));
+				card.addEventListener("focus", () => { if (index !== cloudSelectedIndex) selectCloudCard(index, { scroll: true, focus: false }); });
+				card.addEventListener("keydown", (e) => {
+					if (e.key === "Enter" || e.key === " ") { e.preventDefault(); launchCloudGame(CLOUD_GAMES[index]); }
+				});
+			});
+			menu.addEventListener("scroll", () => {
+				clearTimeout(cloudScrollTimer);
+				cloudScrollTimer = setTimeout(selectNearestCloudCard, 90);
+			}, { passive: true });
+			selectCloudCard(0, { scroll: false, focus: false });
+
+			
+			document.addEventListener("keydown", (e) => {
+				if (!ui.classList.contains("open") || cloudInGame()) return;
+				if (document.getElementById("cloud-settings").classList.contains("show")) return;
+				if (e.altKey || e.ctrlKey || e.metaKey) return;
+				if (e.key === "ArrowRight") { e.preventDefault(); selectCloudCard(cloudSelectedIndex + 1); }
+				else if (e.key === "ArrowLeft") { e.preventDefault(); selectCloudCard(cloudSelectedIndex - 1); }
+			});
+
+			const sw = ui.querySelector("#cloud-swatches");
+			Object.keys(CLOUD_THEMES).forEach((t) => {
+				const b = document.createElement("div");
+				b.className = "cloud-swatch";
+				b.dataset.theme = t;
+				b.title = t;
+				b.style.background = CLOUD_THEMES[t][3];
+				b.onclick = () => setCloudTheme(t);
+				sw.appendChild(b);
+			});
+
+			const pc = ui.querySelector("#cloud-pcards");
+			CLOUD_PARTICLES.forEach(([id, label, icon]) => {
+				const c = document.createElement("div");
+				c.className = "cloud-pcard";
+				c.dataset.p = id;
+				c.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2">' + icon + '</svg><span>' + label + '</span>';
+				c.onclick = () => setCloudParticles(id);
+				pc.appendChild(c);
+			});
+
+			ui.querySelector("#cloud-gear").onclick = () => toggleCloudSettings();
+			ui.querySelector("#cloud-close").onclick = closeCloud;
+			ui.querySelector("#cloud-back").onclick = showCloudMenu;
+
+			const hud = ui.querySelector("#cloud-hud"), trig = ui.querySelector("#cloud-top-trigger");
+			let hudTimer = null;
+			const hudShow = () => { clearTimeout(hudTimer); hud.classList.add("show"); };
+			const hudHide = () => { clearTimeout(hudTimer); hudTimer = setTimeout(() => hud.classList.remove("show"), 300); };
+			trig.addEventListener("mouseenter", hudShow);
+			trig.addEventListener("mouseleave", hudHide);
+			hud.addEventListener("mouseenter", hudShow);
+			hud.addEventListener("mouseleave", hudHide);
+			trig.addEventListener("click", () => (hud.classList.contains("show") ? hudHide() : hudShow()));
+
+			ui.querySelector("#cloud-settings").addEventListener("click", (e) => {
+				if (e.target.id === "cloud-settings") toggleCloudSettings(false);
+			});
+			document.addEventListener("keydown", (e) => {
+				if (e.key !== "Escape" || !ui.classList.contains("open")) return;
+				const settings = document.getElementById("cloud-settings");
+				if (settings.classList.contains("show")) toggleCloudSettings(false);
+				else if (cloudInGame()) showCloudMenu();
+				else closeCloud();
+			});
+
+			setCloudTheme(cloudTheme);
+			setCloudParticles(cpType);
+			return ui;
+		}
+
+		function showCloudMenu() {
+			const frame = document.getElementById("cloud-frame");
+			frame.src = "about:blank";
+			document.getElementById("cloud-game").style.display = "none";
+			document.getElementById("cloud-menu").style.display = "flex";
+			document.getElementById("cloud-back").style.display = "none";
+			document.getElementById("cloud-gear").style.display = "flex";
+			document.getElementById("cloud-hud").classList.remove("show");
+			if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+			
+			requestAnimationFrame(() => selectCloudCard(cloudSelectedIndex, { scroll: false, focus: true }));
+			requestAnimationFrame(() => {
+				const c = cloudCards[cloudSelectedIndex], m = document.getElementById("cloud-menu");
+				if (c && m) m.scrollLeft = c.offsetLeft + c.offsetWidth / 2 - m.clientWidth / 2;
+			});
+		}
+
+		function launchCloudGame(g) {
+			if (!g) return;
+			toggleCloudSettings(false);
+			document.getElementById("cloud-menu").style.display = "none";
+			document.getElementById("cloud-game").style.display = "flex";
+			document.getElementById("cloud-back").style.display = "flex";
+			document.getElementById("cloud-gear").style.display = "none";
+			document.getElementById("cloud-frame").src = g.url;
+			const ui = document.getElementById("cloud-ui");
+			
+			const hud = document.getElementById("cloud-hud");
+			hud.classList.add("show");
+			setTimeout(() => hud.classList.remove("show"), 2200);
+		}
+
+		function closeCloud() {
+			showCloudMenu();
+			toggleCloudSettings(false);
+			document.getElementById("cloud-ui").classList.remove("open");
+			cloudMatrixStop();
+		}
+
+		function openCloud() {
+			const ui = document.getElementById("cloud-ui") || buildCloudUI();
+			ui.classList.add("open");
+			cpResize();
+			cloudMatrixStart();
+			if (!cpRaf) cpRaf = requestAnimationFrame(cpFrame);
+		
+			requestAnimationFrame(() => {
+				const c = cloudCards[cloudSelectedIndex], m = document.getElementById("cloud-menu");
+				if (c && m) m.scrollLeft = c.offsetLeft + c.offsetWidth / 2 - m.clientWidth / 2;
+				selectCloudCard(cloudSelectedIndex, { scroll: false, focus: true });
+			});
+		}
+
+		applyTitleColor(getTitleColorId());
+	</script>
+
+	<script>
+		document.getElementById("csslink").href = `/assets/css/colors/${store.get("singularity_theme") ?? "default"}.css`;
+	</script>
+
+	<script>
+		(function () {
+			const ICONS = {
+				home: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+				gamepad: '<line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>',
+				music: '<circle cx="8" cy="18" r="4"/><path d="M12 18V2l7 4"/>',
+				chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+				bot: '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+				bag: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+				scroll: '<path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/>',
+				puzzle: '<path d="M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z"/>',
+				sliders: '<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
+				globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+				plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+				film: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>',
+				appwindow: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/>',
+				x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+			};
+			const svg = (name) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[name] + '</svg>';
+
+			const APPS = [
+				{ key: "games", title: "Games", icon: "gamepad", urls: ["/pages/games.html", "/games.html"] },
+				{ key: "browse", title: "Browser", icon: "appwindow", urls: ["/pages/browse.html", "/browse.html"] },
+				{ key: "watch", title: "Movies", icon: "film", urls: ["/pages/watch.html", "/watch.html"] },
+				{ key: "listen", title: "Music", icon: "music", urls: ["/pages/listen.html", "/listen.html"] },
+				{ key: "chat", title: "Chat", icon: "chat", urls: ["/chat.html", "/pages/chat.html"] },
+				{ key: "ai", title: "AI", icon: "bot", urls: ["/pages/ai.html", "/ai.html"] },
+				{ key: "settings", title: "Settings", icon: "sliders", urls: ["/pages/settings.html", "/settings.html"] },
+				{ key: "changelog", title: "Update Log", icon: "scroll", urls: [], builtin: "changelog" },
+			];
+
+			const CHANGELOG = [
+				{
+					date: "Oct 22, 2026",
+					title: "New home and navigation",
+					changes: [
+						"New sidebar! for quick access to Games, Music, Chat and AI",
+						"Tab system with an address bar and singularity:// links!",
+						"more organized home screen",
+					],
+				},
+				{
+					date: "Oct 11, 2026",
+					title: "Shop and daily spin",
+					changes: [
+						"Spin the wheel once a day to earn coins",
+						"Spend coins on avatar decorations, profile effects and banners!!",
+						"Equip your items from the shop or from Edit Profile",
+					],
+				},
+			];
+
+			function buildChangelog() {
+				const wrap = document.createElement("div");
+				wrap.className = "sg-cl";
+				const inner = document.createElement("div");
+				inner.className = "sg-cl-inner";
+				inner.innerHTML = '<div class="sg-cl-kicker">CHANGELOG</div><h1 class="sg-cl-title">Update Log</h1><p class="sg-cl-sub">Sites Newest Updates</p>';
+				CHANGELOG.forEach((e) => {
+					const card = document.createElement("article");
+					card.className = "sg-cl-card";
+					const date = document.createElement("span");
+					date.className = "sg-cl-date";
+					date.textContent = e.date;
+					const h = document.createElement("h2");
+					h.textContent = e.title;
+					const list = document.createElement("div");
+					list.className = "sg-cl-list";
+					e.changes.forEach((c) => {
+						const p = document.createElement("p");
+						p.textContent = c;
+						list.appendChild(p);
+					});
+					card.append(date, h, list);
+					inner.appendChild(card);
+				});
+				wrap.appendChild(inner);
+				return wrap;
+			}
+
+			const tabsEl = document.getElementById("sg-tabs");
+			const panesEl = document.getElementById("sg-panes");
+			const railEl = document.getElementById("sg-rail");
+			const addressEl = document.getElementById("sg-address");
+			const backEl = document.getElementById("sg-back");
+			const forwardEl = document.getElementById("sg-forward");
+
+			const tabs = [{ id: "home", key: "home", appKey: "home", title: "Home", icon: null, letter: "H", pane: document.getElementById("sg-home"), frame: null, url: null, closable: false, stack: [], pos: -1 }];
+			let activeId = "home";
+			let seq = 0;
+
+			const findApp = (key) => APPS.find((a) => a.key === key);
+			const getTab = (id) => tabs.find((t) => t.id === id);
+
+			function hostOf(u) {
+				try { return new URL(u, location.href).hostname.replace(/^www\./, "") || u; } catch (e) { return u; }
+			}
+			function normalizeUrl(v) {
+				v = (v || "").trim();
+				if (!v) return null;
+				if (/^[a-z][a-z0-9+.-]*:\/\//i.test(v)) return v;
+				if (v.startsWith("/")) return v;
+				if (/^[^\s/]+\.[^\s/]{2,}(\/\S*)?$/.test(v)) return "https://" + v;
+				return null;
+			}
+			function displayFor(t) {
+				if (t.id === "home") return "singularity://home";
+				if (t.appKey) return "singularity://" + t.appKey;
+				if (t.localName) return "singularity://" + t.localName;
+				return t.url || "";
+			}
+
+			async function resolveUrl(app) {
+				for (const u of app.urls) {
+					try {
+						const r = await fetch(u, { method: "HEAD" });
+						if (r.ok) return u;
+					} catch (e) {}
+				}
+				return app.urls[0];
+			}
+
+			function renderTabs() {
+				tabsEl.innerHTML = "";
+				tabs.forEach((t) => {
+					const b = document.createElement("button");
+					b.type = "button";
+					b.className = "sg-tab" + (t.id === activeId ? " active" : "");
+					b.setAttribute("role", "tab");
+					b.setAttribute("aria-selected", t.id === activeId ? "true" : "false");
+					const ico = document.createElement("span");
+					ico.className = "sg-tab-ico";
+					if (t.letter) ico.textContent = t.letter;
+					else ico.innerHTML = svg(t.icon || "globe");
+					const label = document.createElement("span");
+					label.className = "sg-tab-title";
+					label.textContent = t.title;
+					b.append(ico, label);
+					if (t.closable) {
+						const x = document.createElement("span");
+						x.className = "sg-tab-x";
+						x.setAttribute("role", "button");
+						x.setAttribute("aria-label", "Close tab");
+						x.innerHTML = svg("x");
+						x.addEventListener("click", (e) => { e.stopPropagation(); closeTab(t.id); });
+						b.appendChild(x);
+					}
+					b.addEventListener("click", () => activateTab(t.id));
+					b.addEventListener("auxclick", (e) => { if (e.button === 1 && t.closable) { e.preventDefault(); closeTab(t.id); } });
+					tabsEl.appendChild(b);
+					if (t.id === activeId) b.scrollIntoView({ inline: "nearest", block: "nearest" });
+				});
+				const cur = getTab(activeId);
+				const openKeys = new Set(tabs.map((t) => t.appKey).filter(Boolean));
+				railEl.querySelectorAll(".sg-rail-btn").forEach((b) => {
+					const k = b.dataset.key;
+					const isActive = !!cur && !!k && k === cur.appKey;
+					b.classList.toggle("active", isActive);
+					b.classList.toggle("open", !!k && k !== "home" && !isActive && openKeys.has(k));
+				});
+			}
+
+			function updateToolbar() {
+				const t = getTab(activeId);
+				addressEl.value = displayFor(t);
+				const noFrame = !t.frame || !t.url;
+				backEl.disabled = noFrame;
+				forwardEl.disabled = noFrame;
+			}
+
+			function activateTab(id) {
+				if (!getTab(id)) return;
+				const cloud = document.getElementById("cloud-ui");
+				if (cloud && cloud.classList.contains("open")) closeCloud();
+				activeId = id;
+				tabs.forEach((t) => t.pane.classList.toggle("active", t.id === id));
+				renderTabs();
+				updateToolbar();
+			}
+
+			function closeTab(id) {
+				const i = tabs.findIndex((t) => t.id === id);
+				if (i < 1) return;
+				const t = tabs[i];
+				if (t.frame) t.frame.src = "about:blank";
+				t.pane.remove();
+				tabs.splice(i, 1);
+				if (activeId === id) activateTab(tabs[i - 1].id);
+				else renderTabs();
+			}
+
+			function createTab(def) {
+				const pane = document.createElement("section");
+				pane.className = "sg-pane";
+				let frame = null;
+				if (def.builtin) {
+					pane.classList.add("sg-pane-builtin");
+					pane.appendChild(buildChangelog());
+				} else {
+					frame = document.createElement("iframe");
+					frame.className = "sg-frame";
+					frame.title = def.title;
+					frame.setAttribute("allow", "autoplay; fullscreen; clipboard-read; clipboard-write; gamepad; keyboard-map; pointer-lock");
+					if (def.url) frame.src = def.url;
+					pane.appendChild(frame);
+				}
+				panesEl.appendChild(pane);
+				const t = {
+					id: "t" + (++seq), key: def.key, appKey: def.appKey || null, title: def.title, icon: def.icon,
+					pane, frame, url: def.url || null, closable: true, stack: def.url ? [def.url] : [], pos: def.url ? 0 : -1,
+				};
+				tabs.push(t);
+				if (frame) frame.addEventListener("load", () => onFrameLoad(t));
+				activateTab(t.id);
+				return t;
+			}
+
+			function onFrameLoad(t) {
+				let loc;
+				try {
+					loc = t.frame.contentWindow.location;
+					if (!loc || loc.href === "about:blank") return;
+				} catch (e) { return; }
+				const full = loc.pathname + loc.hash;
+				const app = APPS.find((a) => a.urls.includes(full)) || APPS.find((a) => a.urls.some((u) => u.split("#")[0] === loc.pathname));
+				t.url = loc.href;
+				if (app) {
+					t.appKey = app.key;
+					t.localName = null;
+					t.title = app.title;
+					t.icon = app.icon;
+				} else {
+					t.appKey = null;
+					t.localName = loc.pathname.split("/").pop().replace(/\.html?$/i, "") || "index";
+					let ttl = "";
+					try { ttl = t.frame.contentDocument.title; } catch (e) {}
+					t.title = ttl || t.localName;
+				}
+				renderTabs();
+				if (t.id === activeId) updateToolbar();
+			}
+
+			function navigate(t, url, title, appKey, icon) {
+				t.stack = t.stack.slice(0, t.pos + 1);
+				t.stack.push(url);
+				t.pos = t.stack.length - 1;
+				t.url = url;
+				t.appKey = appKey || null;
+				t.localName = null;
+				t.key = appKey || "url:" + url;
+				t.title = title || hostOf(url);
+				t.icon = icon || "globe";
+				t.frame.src = url;
+				renderTabs();
+				updateToolbar();
+			}
+
+			async function openApp(key, url, title, icon) {
+				const app = findApp(key);
+				const k = app ? app.key : (key || "url:" + url);
+				let t = tabs.find((x) => x.key === k);
+				if (t) { activateTab(t.id); return; }
+				if (app && app.builtin) {
+					createTab({ key: app.key, appKey: app.key, title: app.title, icon: app.icon, builtin: app.builtin });
+					return;
+				}
+				const u = app ? await resolveUrl(app) : url;
+				if (!u) return;
+				t = tabs.find((x) => x.key === k);
+				if (t) { activateTab(t.id); return; }
+				createTab({ key: k, appKey: app ? app.key : null, title: app ? app.title : (title || hostOf(u)), icon: app ? app.icon : (icon || "globe"), url: u });
+			}
+
+			async function goAddress(text) {
+				const v = (text || "").trim();
+				const cur = getTab(activeId);
+				if (!v) { updateToolbar(); return; }
+				const m = v.match(/^singularity:\/\/([^/]+)\/?$/i);
+				if (m) {
+					const k = m[1].toLowerCase();
+					if (k === "home") { activateTab("home"); return; }
+					const app = findApp(k);
+					if (!app) { updateToolbar(); return; }
+					const ex = tabs.find((t) => t.key === app.key);
+					if (ex) { activateTab(ex.id); return; }
+					if (app.builtin || !cur.frame || cur.url) openApp(k);
+					else navigate(cur, await resolveUrl(app), app.title, app.key, app.icon);
+					return;
+				}
+				const url = normalizeUrl(v);
+				if (!url) { updateToolbar(); return; }
+				if (!cur.frame) openApp("url:" + url, url);
+				else navigate(cur, url, hostOf(url), null, "globe");
+			}
+
+			function newBlankTab() {
+				createTab({ key: "new:" + (seq + 1), title: "New Tab", icon: "plus", url: null });
+				addressEl.value = "";
+				addressEl.focus();
+			}
+
+			backEl.addEventListener("click", () => {
+				const t = getTab(activeId);
+				if (!t.frame) return;
+				try { t.frame.contentWindow.history.back(); return; } catch (e) {}
+				if (t.pos > 0) { t.pos--; t.url = t.stack[t.pos]; t.frame.src = t.url; updateToolbar(); }
+			});
+			forwardEl.addEventListener("click", () => {
+				const t = getTab(activeId);
+				if (!t.frame) return;
+				try { t.frame.contentWindow.history.forward(); return; } catch (e) {}
+				if (t.pos < t.stack.length - 1) { t.pos++; t.url = t.stack[t.pos]; t.frame.src = t.url; updateToolbar(); }
+			});
+			document.getElementById("sg-reload").addEventListener("click", () => {
+				const t = getTab(activeId);
+				if (!t.frame || !t.url) return;
+				try { t.frame.contentWindow.location.reload(); } catch (e) { t.frame.src = t.frame.src; }
+			});
+			document.getElementById("sg-new-tab").addEventListener("click", newBlankTab);
+			addressEl.addEventListener("keydown", (e) => {
+				if (e.key === "Enter") { goAddress(addressEl.value); addressEl.blur(); }
+				if (e.key === "Escape") { updateToolbar(); addressEl.blur(); }
+			});
+			addressEl.addEventListener("focus", () => addressEl.select());
+
+			window.sgHandle = function (msg) {
+				if (!msg || typeof msg !== "object") return;
+				if (msg.type === "nfs-open") {
+					if (findApp(msg.key)) openApp(msg.key);
+					else if (msg.url) openApp(msg.key, msg.url, msg.title, "gamepad");
+				} else if (msg.type === "open-update-log") {
+					openApp("changelog");
+				}
+			};
+			window.addEventListener("message", (e) => {
+				if (e.origin === location.origin) window.sgHandle(e.data);
+			});
+
+			const topGroup = document.createElement("div");
+			topGroup.className = "sg-rail-group";
+			railEl.append(topGroup);
+
+			function railButton(group, icon, title, key, onClick) {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.className = "sg-rail-btn";
+				b.title = title;
+				b.setAttribute("aria-label", title);
+				if (key) b.dataset.key = key;
+				b.innerHTML = svg(icon);
+				b.addEventListener("click", onClick);
+				group.appendChild(b);
+			}
+			railButton(topGroup, "home", "Home", "home", () => activateTab("home"));
+			["games", "browse", "watch", "listen", "chat", "ai"].forEach((k) => {
+				const a = findApp(k);
+				railButton(topGroup, a.icon, a.title, a.key, () => openApp(a.key));
+			});
+			railButton(topGroup, "scroll", "Update Log", "changelog", () => openApp("changelog"));
+			railButton(topGroup, "puzzle", "Cloud", null, () => openCloud());
+			railButton(topGroup, "sliders", "Settings", "settings", () => openApp("settings"));
+
+			renderTabs();
+			updateToolbar();
+		})();
+	</script>
+
+</body>
+</html>
