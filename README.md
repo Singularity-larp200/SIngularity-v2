@@ -1,2 +1,5 @@
-# SIngularity-but-open-source-this-time-
-If you use this please credit me
+# What is Singularity?
+
+# Singularity Is an Unblocked Games Website Made By Yours Truly Singularity! 
+
+**We Have Music,Chat,Games,Browser, And So Much More!**
