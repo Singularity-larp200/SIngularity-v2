@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>🧊</text></svg>" />
+  <meta name="theme-color" content="#080808" />
+  <title>| Chat |</title>
+  <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/js/all.min.js" crossorigin="anonymous"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --d-rail: #1e1f22;
+      --d-sidebar: #2b2d31;
+      --d-main: #313338;
+      --d-hover: #35373c;
+      --d-active: #3f4248;
+      --d-blurple: #5865f2;
+      --d-text: #f2f3f5;
+      --d-muted: #949ba4;
+      --d-dim: #80848e;
+      --d-border: #26272b;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-mouse-pointer-2 preview-icon'%3E%3Cpath d='M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z'/%3E%3C/svg%3E") 0 0, auto;
+    }
+    body { font-family: "gg sans", "Helvetica Neue", system-ui, sans-serif; background: var(--d-main); background-size: cover; background-position: center; color: var(--d-text); display: flex; height: 100vh; overflow: hidden; }
+    .bg-swatch { width: 36px; height: 36px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+    .bg-swatch:hover { border-color: #555; }
+    .bg-swatch.selected { border-color: var(--d-blurple); box-shadow: 0 0 0 1px var(--d-blurple); }
+    .gif-result { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; background: #1a1a1a; }
+    .gif-result:hover { border-color: #555; }
+    .gif-result.selected { border-color: var(--d-blurple); box-shadow: 0 0 0 1px var(--d-blurple); }
+
+    #app-rail { width: 72px; flex-shrink: 0; background: var(--d-rail); display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 8px; }
+    #app-rail a { width: 48px; height: 48px; border-radius: 24px; background: var(--d-sidebar); display: flex; align-items: center; justify-content: center; font-size: 22px; text-decoration: none; color: var(--d-blurple); transition: border-radius .15s, background .15s; }
+    #app-rail a:hover { border-radius: 16px; background: var(--d-blurple); color: #fff; }
+    #app-rail .rail-sep { width: 32px; height: 2px; background: var(--d-border); border-radius: 1px; margin: 4px 0; }
+
+    #sidebar { width: 240px; flex-shrink: 0; background: var(--d-sidebar); border-right: 1px solid var(--d-border); display: flex; flex-direction: column; }
+    #sidebar-header { order: 1; padding: 16px; border-bottom: 1px solid var(--d-border); box-shadow: 0 1px 0 rgba(0,0,0,.15); }
+    #sidebar-header h2 { color: #fff; font-size: 15px; font-weight: 700; }
+    #my-profile { order: 3; display: flex; align-items: center; gap: 8px; padding: 10px 8px; background: #232428; border-top: 1px solid var(--d-border); cursor: pointer; }
+    #my-profile:hover { background: #26272b; }
+    #my-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #222; flex-shrink: 0; }
+    #my-info { flex: 1; overflow: hidden; }
+    #my-name { font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+    #my-status-text { font-size: 11px; color: var(--d-muted); white-space: nowrap; }
+    #my-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
+    #channels { order: 2; padding: 12px 8px; flex: 1; overflow-y: auto; }
+    #channels h3 { font-size: 11px; color: var(--d-dim); padding: 0 8px; margin: 14px 0 4px; text-transform: uppercase; letter-spacing: .02em; font-weight: 700; }
+    #channels h3:first-child { margin-top: 0; }
+    .channel { padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 15px; color: var(--d-muted); margin-bottom: 1px; display: flex; align-items: center; gap: 10px; }
+    .channel .channel-icon { width: 16px; text-align: center; flex-shrink: 0; }
+    .channel:hover { background: var(--d-hover); color: var(--d-text); }
+    .channel.active { background: var(--d-active); color: #fff; }
+    .channel.dm { color: var(--d-muted); font-size: 14px; }
+    .channel.dm:hover, .channel.dm.active { color: #fff; }
+    .channel.dm .channel-icon { color: var(--d-dim); }
+    .channel.dm:hover .channel-icon, .channel.dm.active .channel-icon { color: #fff; }
+    .channel.dm span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    #members-panel { width: 240px; flex-shrink: 0; background: var(--d-sidebar); border-left: 1px solid var(--d-border); padding: 16px 8px; overflow-y: auto; }
+    #members-panel h3 { font-size: 12px; color: var(--d-dim); padding: 0 8px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .02em; font-weight: 700; }
+    .user-item { padding: 6px 8px; font-size: 14px; color: var(--d-muted); border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+    .user-item:hover { background: var(--d-hover); color: var(--d-text); }
+    .user-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #222; flex-shrink: 0; }
+    .user-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--d-sidebar); }
+    .dot-online { background: #23a55a; }
+    .dot-away { background: #f0b232; }
+    .dot-busy { background: #f23f42; }
+    .dot-offline { background: #80848e; }
+
+    .status-icon { font-size: 0.85em; margin-right: 6px; }
+    .status-online  { color: #23a55a; }
+    .status-away    { color: #f0b232; }
+    .status-busy    { color: #f23f42; }
+    .status-offline { color: #80848e; }
+
+    .status-select { position: relative; }
+    .status-select-btn { width: 100%; background: var(--d-rail); border: none; color: #fff; padding: 10px 12px; border-radius: 3px; font-size: 15px; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: space-between; text-align: left; }
+    .status-select-btn:focus { outline: 2px solid var(--d-blurple); outline-offset: -1px; }
+    .status-select-btn .chev-down { color: var(--d-dim); font-size: 12px; }
+    .status-select-menu { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #111214; border: 1px solid var(--d-border); border-radius: 8px; padding: 4px; z-index: 30; box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+    .status-select-menu.open { display: block; }
+    .status-select-menu div { padding: 8px 10px; font-size: 14px; border-radius: 4px; cursor: pointer; color: var(--d-text); }
+    .status-select-menu div:hover { background: var(--d-hover); }
+
+    .fa-icon-gap { margin-right: 6px; }
+    .vp-menu-icon { width: 18px; text-align: center; color: var(--d-muted); flex-shrink: 0; }
+    .reply-btn svg, .reply-quote svg { margin-right: 4px; }
+
+    #main { flex: 1; display: flex; flex-direction: column; background: var(--d-main); min-width: 0; }
+    #chat-header { padding: 12px 16px; border-bottom: 1px solid var(--d-border); background: var(--d-main); box-shadow: 0 1px 0 rgba(0,0,0,.15); display: flex; align-items: center; gap: 12px; }
+    #chat-header h2 { color: #fff; font-size: 15px; font-weight: 700; }
+    #mobile-menu-btn, #mobile-members-btn { display: none; background: var(--d-hover); border: none; color: #fff; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+    #sidebar-backdrop, #members-backdrop { display: none; }
+
+    body.has-bg #sidebar, body.has-bg #members-panel { background: rgba(43,45,49,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    body.has-bg #main { background: transparent; }
+    body.has-bg #chat-header { background: rgba(49,51,56,.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    body.has-bg #my-profile { background: rgba(35,36,40,.85); }
+    body.has-bg #input-area input { background: rgba(53,55,60,.9); }
+
+    .edit-banner-preview { height: 90px; border-radius: 8px; background-size: cover; background-position: center; }
+
+    @media (max-width: 768px) {
+      #app-rail { display: none; }
+      #mobile-menu-btn, #mobile-members-btn { display: block; }
+      #sidebar {
+        position: fixed; top: 0; bottom: 0; left: 0;
+        width: 260px; max-width: 80vw; z-index: 200;
+        transform: translateX(-100%); transition: transform 0.2s ease;
+      }
+      #sidebar.open { transform: translateX(0); }
+      #sidebar-backdrop.open {
+        display: block; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.5); z-index: 150;
+      }
+      #members-panel {
+        position: fixed; top: 0; bottom: 0; right: 0;
+        width: 260px; max-width: 80vw; z-index: 200;
+        transform: translateX(100%); transition: transform 0.2s ease;
+      }
+      #members-panel.open { transform: translateX(0); }
+      #members-backdrop.open {
+        display: block; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.5); z-index: 150;
+      }
+      #chat-header h2 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      #input-area { padding: 10px 12px; }
+      .message .msg-avatar, #my-avatar { width: 28px; height: 28px; }
+    }
+    #messages { flex: 1; overflow-y: auto; padding: 16px 16px; display: flex; flex-direction: column; gap: 2px; }
+    #shop-placeholder { display: none; flex: 1; align-items: center; justify-content: center; color: #fff; font-size: 28px; font-weight: 700; }
+    .message { display: flex; gap: 14px; align-items: flex-start; padding: 6px 8px; border-radius: 6px; }
+    .message:hover { background: rgba(0,0,0,0.14); }
+    .reply-btn { font-size: 11px; color: var(--d-dim); cursor: pointer; margin-left: 8px; opacity: 0; transition: opacity 0.1s; }
+    .message:hover .reply-btn { opacity: 1; }
+    .reply-btn:hover { color: var(--yellow, #f5c400); text-decoration: underline; }
+    .reply-quote { font-size: 12px; color: var(--d-dim); border-left: 2px solid #444; padding-left: 8px; margin-bottom: 4px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #reply-preview { display: none; align-items: center; justify-content: space-between; background: var(--d-hover); border-radius: 8px; padding: 6px 12px; margin: 0 16px 8px; font-size: 12px; color: var(--d-muted); }
+    #reply-preview span.close { cursor: pointer; color: var(--d-dim); font-size: 14px; padding: 0 4px; }
+    #reply-preview span.close:hover { color: #fff; }
+    #mod-warning { display: none; align-items: center; justify-content: space-between; background: rgba(242, 63, 66, 0.15); border: 1px solid rgba(242, 63, 66, 0.4); border-radius: 8px; padding: 6px 12px; margin: 0 16px 8px; font-size: 12px; color: #ff8a8d; }
+    #mod-warning span.close { cursor: pointer; color: #ff8a8d; font-size: 14px; padding: 0 4px; }
+    #mod-warning span.close:hover { color: #fff; }
+    #input-area input:disabled, #input-area button:disabled { opacity: .6; cursor: default; }
+    #typing-indicator { display: none; align-items: center; gap: 6px; padding: 0 16px 6px; font-size: 12px; color: var(--d-muted); }
+    #typing-indicator.show { display: flex; }
+    .typing-dots { display: inline-flex; align-items: flex-end; gap: 3px; height: 8px; }
+    .typing-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--d-muted); display: inline-block; animation: typing-bounce 1.2s infinite ease-in-out; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes typing-bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
+    .message.pinged { background: rgba(245, 196, 0, 0.08); border-left: 3px solid var(--yellow, #f5c400); padding-left: 8px; }
+    .message.bot-crisis { background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; padding-left: 8px; }
+    .message.bot-crisis .meta span:first-child { color: #3b82f6; }
+    .mention { background: rgba(88, 101, 242, 0.3); color: #c9d1ff; padding: 1px 5px; border-radius: 5px; font-weight: 600; }
+    .mention-me { background: rgba(245, 196, 0, 0.3); color: #ffe9a8; }
+    #mention-dropdown { position: absolute; bottom: 60px; left: 16px; right: 16px; background: #111214; border: 1px solid var(--d-border); border-radius: 10px; max-height: 180px; overflow-y: auto; display: none; z-index: 20; }
+    #mention-dropdown .mention-option { padding: 8px 12px; font-size: 13px; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    #mention-dropdown .mention-option:hover, #mention-dropdown .mention-option.active { background: var(--d-hover); }
+    #mention-dropdown img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+    .message img.msg-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #222; flex-shrink: 0; cursor: pointer; }
+    .message .msg-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .message .meta { font-size: 12px; color: var(--d-dim); }
+    .message .meta span { color: var(--d-text); font-weight: 600; margin-right: 8px; cursor: pointer; font-size: 15px; }
+    .message .meta span.reply-btn { font-size: 11px; font-weight: 400; color: var(--d-dim); margin-right: 0; }
+    .message .meta span.reply-btn:hover { color: var(--yellow, #f5c400); }
+    .message.mine .meta span { color: #a78bfa; }
+    .message.mine .meta span.reply-btn { color: var(--d-dim); }
+    .message .text { font-size: 15px; color: #dbdee1; word-break: break-word; line-height: 1.4; white-space: pre-line; }
+    #input-area { padding: 0 16px 20px; border-top: none; display: flex; gap: 8px; position: relative; }
+    #input-area input { flex: 1; background: var(--d-hover); border: none; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 15px; outline: none; }
+    #input-area input:focus { outline: none; }
+    #input-area button { background: var(--d-blurple); border: none; color: #fff; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    #input-area button:hover { background: #4752c4; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 9999; justify-content: center; align-items: center; }
+    .modal.open { display: flex; }
+    .modal-box { background: var(--d-sidebar); border: none; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 24px; width: 340px; display: flex; flex-direction: column; gap: 20px; max-height: 85vh; overflow-y: auto; }
+    .modal-box h3 { color: #fff; font-size: 20px; font-weight: 700; }
+    .modal-box label { font-size: 12px; color: var(--d-dim); margin-bottom: 8px; display: block; text-transform: uppercase; font-weight: 700; letter-spacing: .02em; }
+    .modal-box input[type=text], .modal-box textarea, .modal-box select { width: 100%; background: var(--d-rail); border: none; color: #fff; padding: 10px 12px; border-radius: 3px; font-size: 15px; outline: none; font-family: inherit; }
+    .modal-box input[type=text]:focus, .modal-box textarea:focus, .modal-box select:focus { outline: 2px solid var(--d-blurple); outline-offset: -1px; }
+    .modal-box input[type=text]::placeholder, .modal-box textarea::placeholder { color: var(--d-dim); }
+    .modal-box textarea { resize: none; height: 60px; }
+    .modal-avatar-wrap { display: flex; align-items: center; gap: 16px; }
+    .modal-avatar-wrap img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: var(--d-rail); flex-shrink: 0; }
+    .modal-avatar-wrap button { background: var(--d-hover); border: none; color: #fff; padding: 8px 16px; border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: 500; }
+    .modal-avatar-wrap button:hover { background: var(--d-active); }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+    .modal-actions button { padding: 10px 18px; border-radius: 3px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .btn-save { background: var(--d-blurple); color: #fff; }
+    .btn-save:hover { background: #4752c4; }
+    .btn-cancel { background: transparent !important; color: var(--d-muted); border: none !important; padding: 10px 4px !important; }
+    .btn-cancel:hover { color: #fff; text-decoration: underline; }
+
+    .profile-modal-box { padding: 0; width: 620px; max-width: 92vw; gap: 0; overflow: hidden; flex-direction: column; }
+    .profile-modal-columns { display: flex; flex-direction: row; align-items: stretch; }
+    .profile-modal-left { width: 100%; flex-shrink: 0; background: var(--d-sidebar); display: flex; flex-direction: column; min-width: 0; }
+    .profile-modal-header { padding: 16px 20px 10px; }
+    .profile-modal-header h3 { margin: 0; font-size: 16px; }
+    .profile-modal-scroll { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; max-height: 60vh; }
+    .profile-section { background: var(--d-rail); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .profile-section > div:not(:last-child) { margin-bottom: 0; }
+    .profile-modal-scroll label { margin-bottom: 6px; }
+    .profile-modal-actions { padding: 12px 20px; border-top: 1px solid var(--d-border); background: var(--d-sidebar); }
+    .banner-swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+    .banner-swatches .bg-swatch { width: 32px; height: 32px; }
+    .modal-divider { border: none; border-top: 1px solid var(--d-border); margin: 0; }
+    .profile-banner { position: relative; height: 120px; background: var(--profile-banner-preview, linear-gradient(135deg, #5865f2, #8c54ff)); background-size: cover; background-position: center; flex-shrink: 0; }
+    .banner-avatar-wrap { position: absolute; left: 20px; bottom: -40px; width: 90px; height: 90px; border-radius: 50%; }
+    .banner-avatar-wrap img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; background: var(--d-rail); display: block; }
+    .avatar-edit-overlay { position: absolute; inset: 0; border-radius: 50%; background: rgba(0,0,0,0.55); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; opacity: 0; cursor: pointer; transition: opacity .15s; }
+    .banner-avatar-wrap:hover .avatar-edit-overlay { opacity: 1; }
+    #edit-banner-preview .banner-avatar-wrap img { border: 6px solid var(--d-main); }
+    .profile-preview-body { padding: 52px 20px 20px; flex: 1; }
+    .profile-preview-body h4 { color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .profile-preview-body .status-badge { display: inline-block; font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--d-rail); color: var(--d-text); margin-bottom: 12px; }
+    .profile-preview-body p { font-size: 14px; color: var(--d-muted); line-height: 1.4; word-break: break-word; }
+    @media (max-width: 640px) {
+      .profile-modal-box { width: 96vw; }
+      .profile-modal-columns { flex-direction: column; }
+      .profile-modal-left { width: 100%; border-right: none; border-bottom: 1px solid var(--d-border); }
+    }
+    #view-profile .modal-box { align-items: center; text-align: center; padding: 0 0 20px; width: 320px; gap: 12px; }
+    #view-profile .profile-banner { border-radius: 8px 8px 0 0; margin-bottom: 46px; width: 100%; }
+    #view-profile .banner-avatar-wrap { left: 50%; transform: translateX(-50%); width: 84px; height: 84px; bottom: -34px; }
+    #view-profile img#vp-avatar { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; background: var(--d-rail); border: 5px solid var(--d-sidebar); }
+    #view-profile h4 { color: #fff; font-size: 18px; font-weight: 700; }
+    #view-profile p { font-size: 14px; color: var(--d-muted); padding: 0 20px; }
+    #view-profile .status-badge { font-size: 13px; padding: 3px 12px; border-radius: 999px; background: var(--d-rail); color: var(--d-text); }
+    #dm-btn { background: var(--d-hover); border: none; color: #fff; padding: 10px 18px; border-radius: 3px; cursor: pointer; font-size: 14px; font-weight: 500; width: calc(100% - 40px); }
+    #dm-btn:hover { background: var(--d-active); }
+    .vp-menu-row { display: flex; align-items: center; gap: 10px; padding: 10px 8px; font-size: 14px; color: var(--d-text); cursor: pointer; border-radius: 4px; position: relative; text-align: left; }
+    .vp-menu-row:hover { background: var(--d-hover); }
+    .vp-menu-row .chev { margin-left: auto; color: var(--d-dim); font-size: 12px; }
+    .vp-status-picker { display: none; position: absolute; right: 0; bottom: calc(100% + 4px); background: #111214; border: 1px solid var(--d-border); border-radius: 8px; padding: 4px; min-width: 130px; z-index: 20; box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+    .vp-status-picker.open { display: block; }
+    .vp-status-picker div { padding: 7px 10px; font-size: 13px; border-radius: 4px; cursor: pointer; color: var(--d-text); }
+    .vp-status-picker div:hover { background: var(--d-hover); }
+    #view-profile .modal-actions { width: calc(100% - 40px); }
+    .rainbow { background: linear-gradient(90deg,#ff0000,#ff7700,#ffff00,#00ff00,#0000ff,#8b00ff,#ff0000); background-size: 200% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: rainbow-shift 3s linear infinite; }
+
+    @keyframes rainbow-shift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: -200% 50%; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h2><i class="fa-solid fa-cubes"></i> Singularity</h2>
+  </div>
+  <div id="my-profile" onclick="openMyProfile()">
+    <img id="my-avatar" src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%232a2a2a'%2F%3E%3Ccircle%20cx%3D'50'%20cy%3D'38'%20r%3D'18'%20fill%3D'%23606060'%2F%3E%3Cpath%20d%3D'M50%2058c-23%200-36%2015-36%2030v12h72V88c0-15-13-30-36-30z'%20fill%3D'%23606060'%2F%3E%3C%2Fsvg%3E" />
+    <div id="my-info">
+      <div id="my-name">Anonymous</div>
+      <div id="my-status-text"></div>
+    </div>
+    <div id="my-status-dot" class="user-dot dot-online"></div>
+  </div>
+  <div id="channels">
+    <h3>Channels</h3>
+    <div class="channel active" data-channel="global" onclick="openChannel('global')"><i class="fa-solid fa-globe channel-icon"></i> Global Chat</div>
+    <div class="channel" data-channel="gaming" onclick="openChannel('gaming')"><i class="fa-solid fa-gamepad channel-icon"></i> Gaming</div>
+    <div class="channel" data-channel="random" onclick="openChannel('random')"><i class="fa-solid fa-cloud channel-icon"></i> Random</div>
+    <div class="channel" data-channel="shop" onclick="openChannel('shop')"><i class="fa-solid fa-cart-shopping channel-icon"></i> Shop</div>
+    <h3 style="margin-top:12px;">Direct Messages</h3>
+    <div id="dm-list"></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="chat-header">
+    <button id="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebar-backdrop').classList.toggle('open');"><i class="fa-solid fa-bars"></i></button>
+    <h2 id="channel-title"><i class="fa-solid fa-globe"></i>  global</h2>
+    <button id="mobile-members-btn" style="margin-left:auto;" onclick="document.getElementById('members-panel').classList.toggle('open'); document.getElementById('members-backdrop').classList.toggle('open');"><i class="fa-solid fa-users"></i></button>
+  </div>
+  <div id="sidebar-backdrop" onclick="document.getElementById('sidebar').classList.remove('open'); this.classList.remove('open');"></div>
+  <div id="messages"></div>
+  <div id="shop-placeholder"></div>
+  <div id="reply-preview">
+    <span id="reply-preview-text"></span>
+    <span class="close" onclick="cancelReply()"><i class="fa-solid fa-xmark"></i></span>
+  </div>
+  <div id="mod-warning">
+    <span id="mod-warning-text"></span>
+    <span class="close" onclick="hideModWarning()"><i class="fa-solid fa-xmark"></i></span>
+  </div>
+  <div id="typing-indicator">
+    <span id="typing-indicator-text"></span>
+    <span class="typing-dots"><span></span><span></span><span></span></span>
+  </div>
+  <div id="input-area">
+    <div id="mention-dropdown"></div>
+    <input id="msg-input" type="text" placeholder="Message..." onkeydown="handleMsgInputKeydown(event)" oninput="handleMentionInput(); notifyTyping();">
+    <button id="send-btn" onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<div id="members-backdrop" onclick="document.getElementById('members-panel').classList.remove('open'); this.classList.remove('open');"></div>
+<div id="members-panel">
+  <h3>Online — <span id="online-count">0</span></h3>
+  <div id="online-users"></div>
+</div>
+
+<div id="shop-catalog" hidden>
+  <div class="shop-item" data-type="avatar" data-file="avatar-decorations/ring.png" data-name="Glowing Rings" data-desc="A mysterious glowing ring around your profile" data-price="1500"></div>
+  <div class="shop-item" data-type="avatar" data-file="avatar-decorations/spirits.gif" data-name="Spirits" data-desc="Restless spirits drifting around your profile" data-price="1200"></div>
+  <div class="shop-item" data-type="effect" data-file="profile-effects/candlelight.gif" data-name="Candlelight" data-desc="Flickering candles lighting up your profile" data-price="1000"></div>
+  <div class="shop-item" data-type="effect" data-file="profile-effects/sparks.gif" data-name="Sparks" data-desc="Sparks lighting up your profile" data-price="2500"></div>
+  <div class="shop-item" data-type="banner" data-file="banners/haunted-midnight.png" data-name="Haunted Midnight" data-desc="A haunted midnight over your profile" data-price="1,700"></div>
+</div>
+
+<div class="modal" id="edit-profile">
+  <div class="modal-box profile-modal-box">
+    <div class="profile-modal-columns">
+      <div class="profile-modal-left">
+        <div class="profile-modal-header"><h3>Edit Profile</h3></div>
+        <div class="profile-modal-scroll">
+          <div class="profile-section">
+            <div>
+              <label>Avatar</label>
+              <div class="modal-avatar-wrap">
+                <img id="edit-avatar-preview" src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%232a2a2a'%2F%3E%3Ccircle%20cx%3D'50'%20cy%3D'38'%20r%3D'18'%20fill%3D'%23606060'%2F%3E%3Cpath%20d%3D'M50%2058c-23%200-36%2015-36%2030v12h72V88c0-15-13-30-36-30z'%20fill%3D'%23606060'%2F%3E%3C%2Fsvg%3E" />
+                <div>
+                  <button onclick="document.getElementById('avatar-file').click()">Upload Photo</button>
+                  <input type="file" id="avatar-file" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+                  <div style="font-size:12px;color:var(--d-dim);margin-top:6px;">Max ~1MB</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label>Banner</label>
+              <div id="edit-banner-preview" class="edit-banner-preview"></div>
+              <div style="display:flex;gap:8px;margin:8px 0;">
+                <button type="button" onclick="document.getElementById('banner-file').click()" style="flex:1;background:var(--d-hover);border:none;color:#fff;padding:8px;border-radius:3px;cursor:pointer;font-size:13px;"><i class="fa-solid fa-image fa-icon-gap"></i>Upload Banner</button>
+                <button type="button" onclick="removeBannerImage()" style="background:var(--d-hover);border:none;color:#fff;padding:8px 12px;border-radius:3px;cursor:pointer;font-size:13px;">Remove</button>
+              </div>
+              <input type="file" id="banner-file" accept="image/*" style="display:none" onchange="handleBannerUpload(event)">
+              <div id="banner-presets" class="banner-swatches"></div>
+            </div>
+            <div>
+              <label>Username</label>
+              <input type="text" id="edit-username" maxlength="20" placeholder="Your name...">
+            </div>
+            <div>
+              <label>Bio</label>
+              <textarea id="edit-bio" maxlength="100" placeholder="Tell people about yourself..."></textarea>
+            </div>
+            <div>
+              <label>Status</label>
+              <div class="status-select">
+                <button type="button" class="status-select-btn" onclick="toggleEditStatusMenu(event)">
+                  <span id="edit-status-display"></span>
+                  <i class="fa-solid fa-chevron-down chev-down"></i>
+                </button>
+                <div class="status-select-menu" id="edit-status-menu">
+                  <div onclick="setEditStatus('online', event)"><i class="fa-solid fa-circle status-icon status-online"></i> Online</div>
+                  <div onclick="setEditStatus('away', event)"><i class="fa-solid fa-moon status-icon status-away"></i> Away</div>
+                  <div onclick="setEditStatus('busy', event)"><i class="fa-solid fa-circle-minus status-icon status-busy"></i> Busy</div>
+                </div>
+              </div>
+              <input type="hidden" id="edit-status" value="online">
+            </div>
+          </div>
+          <div class="profile-section">
+            <div>
+              <label>Shop Items</label>
+              <div id="edit-inventory"></div>
+            </div>
+          </div>
+          <div class="profile-section">
+            <div>
+              <label>Background</label>
+              <div id="bg-presets" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;"></div>
+              <button type="button" onclick="document.getElementById('bg-file').click()" style="background:var(--d-hover); border:none; color:#fff; padding:10px 12px; border-radius:3px; cursor:pointer; font-size:13px; font-weight:500; width:100%;"><i class="fa-solid fa-upload fa-icon-gap"></i>Upload Custom Background</button>
+              <input type="file" id="bg-file" accept="image/*" style="display:none" onchange="handleBackgroundUpload(event)">
+              <div style="font-size:12px;color:var(--d-dim);margin:6px 0 14px;">Only visible to you · Max ~3MB</div>
+              <div style="display:flex; gap:6px; margin-bottom:8px;">
+                <input type="text" id="gif-search-input" placeholder="Search Tenor GIFs..." style="flex:1; background:var(--d-main); border:none; color:#fff; padding:10px 12px; border-radius:3px; font-size:14px; outline:none; font-family:inherit;" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchGifs();}">
+                <button type="button" onclick="searchGifs()" style="background:var(--d-blurple); border:none; color:#fff; padding:10px 16px; border-radius:3px; cursor:pointer; font-size:13px; font-weight:500;"><i class="fa-solid fa-magnifying-glass fa-icon-gap"></i>Search</button>
+              </div>
+              <div id="gif-results" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; max-height:160px; overflow-y:auto;"></div>
+              <div id="gif-status" style="font-size:12px;color:var(--d-dim);margin-top:6px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions profile-modal-actions">
+      <button class="btn-cancel" onclick="closeModal('edit-profile')">Cancel</button>
+      <button class="btn-save" onclick="saveProfile()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="view-profile">
+  <div class="modal-box">
+    <div class="profile-banner" id="vp-banner">
+      <div class="banner-avatar-wrap">
+        <img id="vp-avatar" src="" />
+      </div>
+    </div>
+    <h4 id="vp-name"></h4>
+    <span class="status-badge" id="vp-status"></span>
+    <p id="vp-bio"></p>
+    <button id="dm-btn" onclick="startDMFromProfile()"><i class="fa-solid fa-message fa-icon-gap"></i>Send DM</button>
+    <div id="vp-self-menu" style="display:none; width:calc(100% - 40px);">
+      <hr class="modal-divider" style="margin:4px 0 8px;">
+      <div class="vp-menu-row" onclick="editProfileFromView()">
+        <span class="vp-menu-icon"><i class="fa-solid fa-pen"></i></span><span>Edit Profile</span>
+      </div>
+      <div class="vp-menu-row" id="vp-status-row" onclick="toggleStatusPicker(event)">
+        <span id="vp-status-text"></span><span class="chev"><i class="fa-solid fa-chevron-right"></i></span>
+        <div id="vp-status-picker" class="vp-status-picker">
+          <div onclick="quickSetStatus(event,'online')"><i class="fa-solid fa-circle status-icon status-online"></i> Online</div>
+          <div onclick="quickSetStatus(event,'away')"><i class="fa-solid fa-moon status-icon status-away"></i> Away</div>
+          <div onclick="quickSetStatus(event,'busy')"><i class="fa-solid fa-circle-minus status-icon status-busy"></i> Busy</div>
+        </div>
+      </div>
+      <div class="vp-menu-row" id="vp-account-row" onclick="handleAccountRowClick()">
+        <span id="vp-account-icon" class="vp-menu-icon"></span><span id="vp-account-text">Sign in with Google</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" style="width:100%" onclick="closeModal('view-profile')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, browserLocalPersistence, GoogleAuthProvider, linkWithPopup, signInWithPopup, signInWithCredential, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+  import { getDatabase, ref, push, set, get, update, onValue, onChildAdded, onChildChanged, onChildRemoved, off, query, orderByChild, limitToLast, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFQFc5KcUDWT7r-V0UvyUznQ6IeCESINg",
+    authDomain: "larp-larp-sahur.firebaseapp.com",
+    databaseURL: "https://larp-larp-sahur-default-rtdb.firebaseio.com",
+    projectId: "larp-larp-sahur",
+    storageBucket: "larp-larp-sahur.firebasestorage.app",
+    messagingSenderId: "810674651244",
+    appId: "1:810674651244:web:85fdecc13a4dc8dd0a5849"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  let currentUser = null;
+  let currentChannel = 'global';
+  let viewingUID = null;
+  let newAvatarBase64 = null;
+  const messageEls = new Map();
+
+  const dmLabelEls = {};
+
+  const VALID_STATUSES = ['online', 'away', 'busy'];
+  const savedStatus = localStorage.getItem('surge_status');
+
+  let profile = {
+    username: localStorage.getItem('surge_username') || 'Anonymous',
+    bio: localStorage.getItem('surge_bio') || '',
+    status: VALID_STATUSES.includes(savedStatus) ? savedStatus : 'online',
+    avatar: localStorage.getItem('surge_avatar') || '',
+    bannerColor: localStorage.getItem('surge_banner') || 'blurple',
+    bannerImage: ''
+  };
+
+  const BANNER_PRESETS = [
+    { id: 'blurple', label: 'Blurple', css: 'linear-gradient(135deg, #5865f2, #8c54ff)' },
+    { id: 'green',   label: 'Green',   css: 'linear-gradient(135deg, #23a55a, #0e8a6a)' },
+    { id: 'yellow',  label: 'Yellow',  css: 'linear-gradient(135deg, #f0b232, #e08a2f)' },
+    { id: 'red',     label: 'Red',     css: 'linear-gradient(135deg, #f23f42, #b8232c)' },
+    { id: 'pink',    label: 'Pink',    css: 'linear-gradient(135deg, #ee6bb0, #a3348c)' },
+    { id: 'teal',    label: 'Teal',    css: 'linear-gradient(135deg, #17b6a7, #0a5f70)' },
+    { id: 'slate',   label: 'Slate',   css: 'linear-gradient(135deg, #4a4d55, #23242a)' }
+  ];
+
+  function bannerCss(id) {
+    return (BANNER_PRESETS.find(p => p.id === id) || BANNER_PRESETS[0]).css;
+  }
+
+  function bannerBg(color, image) {
+    return image ? `url("${image}") center / cover no-repeat` : bannerCss(color);
+  }
+
+  let pendingBanner;
+  function currentBannerImage() {
+    return pendingBanner === undefined ? profile.bannerImage : pendingBanner;
+  }
+  function updateBannerPreview() {
+    document.getElementById('edit-banner-preview').style.background = bannerBg(profile.bannerColor, currentBannerImage());
+  }
+
+  window.handleBannerUpload = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const W = 600, H = 200;
+        const canvas = document.createElement('canvas');
+        canvas.width = W; canvas.height = H;
+        const scale = Math.max(W / img.width, H / img.height);
+        const w = img.width * scale, h = img.height * scale;
+        canvas.getContext('2d').drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+        pendingBanner = canvas.toDataURL('image/jpeg', 0.75);
+        updateBannerPreview();
+      };
+      img.onerror = () => alert('Could not load that image.');
+      img.src = e.target.result;
+    };
+    reader.onerror = () => alert('Could not read that file.');
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  };
+
+  window.removeBannerImage = function() {
+    pendingBanner = '';
+    updateBannerPreview();
+  };
+
+  function renderBannerPresets() {
+    const wrap = document.getElementById('banner-presets');
+    wrap.innerHTML = '';
+    BANNER_PRESETS.forEach(p => {
+      const sw = document.createElement('div');
+      sw.className = 'bg-swatch' + (profile.bannerColor === p.id ? ' selected' : '');
+      sw.style.background = p.css;
+      sw.style.borderRadius = '50%';
+      sw.title = p.label;
+      sw.onclick = () => {
+        profile.bannerColor = p.id;
+        pendingBanner = '';
+        renderBannerPresets();
+        updateBannerPreview();
+      };
+      wrap.appendChild(sw);
+    });
+  }
+
+  window._presenceSnap = {};
+
+  const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%232a2a2a'%2F%3E%3Ccircle%20cx%3D'50'%20cy%3D'38'%20r%3D'18'%20fill%3D'%23606060'%2F%3E%3Cpath%20d%3D'M50%2058c-23%200-36%2015-36%2030v12h72V88c0-15-13-30-36-30z'%20fill%3D'%23606060'%2F%3E%3C%2Fsvg%3E";
+
+  const CRISIS_BOT_UID = 'crisis-bot';
+  const CRISIS_BOT_NAME = '[bot]';
+  const CRISIS_BOT_AVATAR = "data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%232a2a2a'%2F%3E%3Ccircle%20cx%3D'50'%20cy%3D'38'%20r%3D'18'%20fill%3D'%233b82f6'%2F%3E%3Cpath%20d%3D'M50%2058c-23%200-36%2015-36%2030v12h72V88c0-15-13-30-36-30z'%20fill%3D'%233b82f6'%2F%3E%3C%2Fsvg%3E";
+
+  function crisisResourceText(username) {
+    return `@${username} It looks like you might be going through something really difficult right now. You're not alone, and support is available:
+
+ 988 Suicide & Crisis Lifeline — call or text 988 (US)
+ Crisis Text Line — text HOME to 741741
+ Outside the US? Find a local helpline at findahelpline.com
+
+If you're in immediate danger, please contact your local emergency services.`;
+  }
+
+  async function sendCrisisBotMessage(path, username) {
+    try {
+      const botRef = push(ref(db, path));
+      await set(botRef, {
+        text: crisisResourceText(username),
+        username: CRISIS_BOT_NAME,
+        uid: CRISIS_BOT_UID,
+        avatar: CRISIS_BOT_AVATAR,
+        timestamp: serverTimestamp()
+      });
+    } catch (err) {
+      console.error('Failed to send crisis resource message:', err);
+    }
+  }
+
+  const BG_PRESETS = [
+    { id: 'default',  label: 'Default',  css: '#0a0a0a' },
+    { id: 'midnight', label: 'Midnight', css: 'linear-gradient(160deg, #0f0c29, #302b63, #24243e)' },
+    { id: 'sunset',   label: 'Sunset',   css: 'linear-gradient(160deg, #1a0b2e, #6e1f4d, #c1396b)' },
+    { id: 'ocean',    label: 'Ocean',    css: 'linear-gradient(160deg, #001220, #0a3d62, #155a78)' },
+    { id: 'forest',   label: 'Forest',   css: 'linear-gradient(160deg, #051b11, #0d3b24, #1d5c3a)' },
+    { id: 'ember',    label: 'Ember',    css: 'linear-gradient(160deg, #1a0000, #4a0e0e, #8a2c0e)' }
+  ];
+  let customBackground = localStorage.getItem('surge_bg_custom') || null;
+  let backgroundChoice = localStorage.getItem('surge_bg_choice') || 'default';
+  let gifBackgroundUrl = localStorage.getItem('surge_bg_gif') || null;
+
+  const WORKER_URL = 'https://YOUR-WORKER.workers.dev';
+  const WORKER_READY = !!WORKER_URL && !WORKER_URL.includes('YOUR-WORKER');
+  let gifSearchSeq = 0;
+
+  const GEMINI_MODEL = 'gemini-3.6-flash';
+  const MODERATION_SYSTEM_PROMPT = `You are a content moderation classifier for a public group chat.
+Given a single chat message, decide whether it violates any of these policies. Judge by the message's
+actual meaning and intent, not surface similarity to any word or phrase — casual profanity, jokes,
+sarcasm, gaming banter, and ordinary disagreement are NOT violations.
+
+- sexual_content: sexual or sexually explicit content, requests for sexual acts, sexual harassment
+- csae: any sexual content involving minors, grooming, or sexualization of minors
+- hate_or_racism: hate speech or slurs targeting someone's race, ethnicity, religion, gender, sexual
+  orientation, disability, or similar trait; advocacy of discrimination or violence against such a group
+- harassment_or_violence: bullying, encouraging others to bully/harass a specific person, direct
+  threats, or incitement of violence against an individual
+- self_harm: encouraging, instructing, or glorifying suicide or self-harm TOWARD SOMEONE ELSE (e.g.
+  telling another person to hurt themselves, or general pro-suicide/self-harm promotion). This does
+  NOT include a person expressing their own distress — see crisisRisk below instead.
+- illegal_or_dangerous: support for terrorism, instructions for illegal weapons, malicious hacking,
+  or other serious illegal activity
+- other_severe: other severe harmful content not covered above
+
+Only set blocked=true for genuine, clear violations of the above — not borderline or ambiguous cases.
+
+Separately, set crisisRisk=true if the message itself (from the sender, about themselves) expresses
+suicidal thoughts, self-harm urges, hopelessness, or being in a crisis — e.g. "I want to end it all",
+"I don't want to be here anymore", "I'm thinking about killing myself", "I can't do this anymore and
+want to hurt myself". This is about the sender's own wellbeing, not a violation: a message like this
+must have blocked=false (do not also flag it under self_harm or any other category) so it still reaches
+the chat — the goal is to surface support resources to them, never to silence them. Do not set
+crisisRisk=true for unrelated use of words like "kill"/"die" (e.g. "this game is killing me").
+
+Respond ONLY with the JSON object described by the schema: a "blocked" boolean, a "categories" array
+listing which category names above applied (empty if not blocked), and a "crisisRisk" boolean.`;
+
+  async function moderateMessage(text) {
+    if (!WORKER_READY) {
+      console.warn('Moderation skipped: set WORKER_URL to your deployed worker.');
+      return { blocked: false, skipped: true };
+    }
+    try {
+      const res = await fetch(
+        `${WORKER_URL}/gemini?model=${encodeURIComponent(GEMINI_MODEL)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: MODERATION_SYSTEM_PROMPT }] },
+            contents: [{ parts: [{ text }] }],
+            generationConfig: {
+              responseMimeType: 'application/json',
+              responseSchema: {
+                type: 'OBJECT',
+                properties: {
+                  blocked: { type: 'BOOLEAN' },
+                  categories: { type: 'ARRAY', items: { type: 'STRING' } },
+                  crisisRisk: { type: 'BOOLEAN' }
+                },
+                required: ['blocked', 'categories', 'crisisRisk']
+              }
+            },
+            safetySettings: [
+              { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+              { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+              { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+              { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+            ]
+          })
+        }
+      );
+      if (!res.ok) {
+        console.error('Moderation request failed:', res.status, await res.text().catch(() => ''));
+        return { blocked: false, error: true };
+      }
+      const data = await res.json();
+      if (data.promptFeedback && data.promptFeedback.blockReason) {
+        return { blocked: true, categories: [data.promptFeedback.blockReason] };
+      }
+      const outText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!outText) return { blocked: false };
+      const parsed = JSON.parse(outText);
+      return { blocked: !!parsed.blocked, categories: parsed.categories || [], crisisRisk: !!parsed.crisisRisk };
+    } catch (err) {
+      console.error('Moderation error:', err);
+      return { blocked: false, error: true };
+    }
+  }
+
+  const HEARTBEAT_INTERVAL_MS = 25000;
+  const STALE_AFTER_MS = 70000;
+  let heartbeatTimer = null;
+  let onlineListTicker = null;
+
+  function isStale(data) {
+    if (!data.lastSeen || typeof data.lastSeen !== 'number') return true;
+    return (Date.now() - data.lastSeen) > STALE_AFTER_MS;
+  }
+
+  function statusColor(s) {
+    return { online: 'dot-online', away: 'dot-away', busy: 'dot-busy', offline: 'dot-offline' }[s] || 'dot-offline';
+  }
+
+  const STATUS_META = {
+    online:  { icon: 'fa-circle',       label: 'Online'  },
+    away:    { icon: 'fa-moon',         label: 'Away'    },
+    busy:    { icon: 'fa-circle-minus', label: 'Busy'    },
+    offline: { icon: 'fa-circle',       label: 'Offline' }
+  };
+
+  function statusLabel(s) {
+    const key = STATUS_META[s] ? s : 'offline';
+    const m = STATUS_META[key];
+    return `<i class="fa-solid ${m.icon} status-icon status-${key}"></i> ${m.label}`;
+  }
+
+  window.setEditStatus = function(status, event) {
+    if (event) event.stopPropagation();
+    document.getElementById('edit-status').value = status;
+    document.getElementById('edit-status-display').innerHTML = statusLabel(status);
+    document.getElementById('edit-status-menu').classList.remove('open');
+  };
+
+  window.toggleEditStatusMenu = function(event) {
+    event.stopPropagation();
+    document.getElementById('edit-status-menu').classList.toggle('open');
+  };
+
+  function applyBackground() {
+    let bg = null;
+    if (backgroundChoice === 'custom' && customBackground) bg = customBackground;
+    else if (backgroundChoice === 'gif' && gifBackgroundUrl) bg = gifBackgroundUrl;
+    let hasBg = !!bg;
+    if (bg) {
+      document.body.style.background = `#0a0a0a url("${bg}") center / cover no-repeat`;
+    } else {
+      const preset = BG_PRESETS.find(p => p.id === backgroundChoice) || BG_PRESETS[0];
+      document.body.style.background = preset.css;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      hasBg = preset.id !== 'default';
+    }
+    document.body.classList.toggle('has-bg', hasBg);
+  }
+
+  function saveBgPrefs() {
+    try {
+      localStorage.setItem('surge_bg_choice', backgroundChoice);
+      if (customBackground) localStorage.setItem('surge_bg_custom', customBackground);
+      if (gifBackgroundUrl) localStorage.setItem('surge_bg_gif', gifBackgroundUrl);
+    } catch (err) {
+      console.error('Failed to save background:', err);
+      alert('Could not save that background.');
+    }
+  }
+
+  function renderBgPresets() {
+    const wrap = document.getElementById('bg-presets');
+    wrap.innerHTML = '';
+    BG_PRESETS.forEach(p => {
+      const sw = document.createElement('div');
+      sw.className = 'bg-swatch' + (backgroundChoice === p.id ? ' selected' : '');
+      sw.style.background = p.css;
+      sw.title = p.label;
+      sw.onclick = () => { backgroundChoice = p.id; applyBackground(); renderBgPresets(); saveBgPrefs(); };
+      wrap.appendChild(sw);
+    });
+    if (customBackground) {
+      const sw = document.createElement('div');
+      sw.className = 'bg-swatch' + (backgroundChoice === 'custom' ? ' selected' : '');
+      sw.style.background = `url("${customBackground}") center/cover`;
+      sw.title = 'Your custom background';
+      sw.onclick = () => { backgroundChoice = 'custom'; applyBackground(); renderBgPresets(); saveBgPrefs(); };
+      wrap.appendChild(sw);
+    }
+    if (gifBackgroundUrl) {
+      const sw = document.createElement('div');
+      sw.className = 'bg-swatch' + (backgroundChoice === 'gif' ? ' selected' : '');
+      sw.style.background = `url("${gifBackgroundUrl}") center/cover`;
+      sw.title = 'Your GIF background';
+      sw.onclick = () => { backgroundChoice = 'gif'; applyBackground(); renderBgPresets(); saveBgPrefs(); };
+      wrap.appendChild(sw);
+    }
+  }
+
+  window.searchGifs = async function() {
+    const input = document.getElementById('gif-search-input');
+    const statusEl = document.getElementById('gif-status');
+    const resultsEl = document.getElementById('gif-results');
+    const q = input.value.trim();
+    if (!q) return;
+    const seq = ++gifSearchSeq;
+    if (!WORKER_READY) { statusEl.textContent = 'GIF search is not set up yet (WORKER_URL).'; return; }
+    statusEl.textContent = 'Searching...';
+    resultsEl.innerHTML = '';
+    try {
+      const url = `${WORKER_URL}/tenor?q=${encodeURIComponent(q)}&limit=12`;
+      const res = await fetch(url);
+      if (seq !== gifSearchSeq) return;
+      if (!res.ok) throw new Error('Tenor request failed (' + res.status + ')');
+      const data = await res.json();
+      if (seq !== gifSearchSeq) return;
+      const gifs = data.results || [];
+      if (gifs.length === 0) { statusEl.textContent = 'No GIFs found.'; return; }
+      let rendered = 0;
+      gifs.forEach(g => {
+        const fmt = g.media_formats || {};
+        const thumbUrl = (fmt.tinygif || fmt.nanogif || fmt.gif || {}).url;
+        const fullUrl = (fmt.gif || fmt.mediumgif || fmt.tinygif || {}).url;
+        if (!thumbUrl || !fullUrl) return;
+        const img = document.createElement('img');
+        img.className = 'gif-result';
+        img.src = thumbUrl;
+        img.loading = 'lazy';
+        img.alt = g.content_description || 'GIF';
+        img.onclick = () => { gifBackgroundUrl = fullUrl; backgroundChoice = 'gif'; applyBackground(); renderBgPresets(); saveBgPrefs(); };
+        resultsEl.appendChild(img);
+        rendered++;
+      });
+      statusEl.textContent = rendered === 0 ? 'No usable images found.' : '';
+    } catch (err) {
+      if (seq !== gifSearchSeq) return;
+      statusEl.textContent = err.message || 'Could not search GIFs.';
+    }
+  };
+
+  window.handleBackgroundUpload = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) { alert('Too large. Max ~3MB.'); event.target.value = ''; return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const s = Math.min(1, 1600 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s);
+        c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        customBackground = c.toDataURL('image/jpeg', 0.8);
+        backgroundChoice = 'custom';
+        applyBackground(); renderBgPresets(); saveBgPrefs();
+      };
+      img.onerror = () => alert('Could not load that image.');
+      img.src = e.target.result;
+    };
+    reader.onerror = () => alert('Could not read that image.');
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  };
+
+  applyBackground();
+
+  function avatarUrl(data) {
+    return (data && data.avatar) ? data.avatar : DEFAULT_AVATAR;
+  }
+
+  function updateSidebarProfile() {
+    const nameEl = document.getElementById('my-name');
+    nameEl.className = '';
+    nameEl.style.cssText = 'font-size:13px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+    nameEl.textContent = profile.username;
+    document.getElementById('my-avatar').src = avatarUrl(profile);
+    const dot = document.getElementById('my-status-dot');
+    dot.className = 'user-dot ' + statusColor(profile.status);
+    document.getElementById('my-status-text').innerHTML = statusLabel(profile.status);
+    renderOnlineUsers();
+  }
+
+  async function savePresence() {
+    if (!currentUser) return;
+    await set(ref(db, 'presence/' + currentUser.uid), {
+      username: profile.username,
+      bio: profile.bio,
+      status: profile.status,
+      avatar: profile.avatar,
+      bannerColor: profile.bannerColor,
+      avatarDecoration: profile.avatarDecoration || '',
+      profileEffect: profile.profileEffect || '',
+      shopBanner: profile.shopBanner || '',
+      online: true,
+      lastSeen: serverTimestamp()
+    });
+  }
+
+  window.openEditProfile = function() {
+    document.getElementById('edit-username').value = profile.username;
+    document.getElementById('edit-bio').value = profile.bio;
+    setEditStatus(profile.status === 'offline' ? 'online' : profile.status);
+    document.getElementById('edit-avatar-preview').src = avatarUrl(profile);
+    newAvatarBase64 = null;
+    renderBannerPresets();
+    pendingBanner = undefined;
+    updateBannerPreview();
+    renderBgPresets();
+    document.getElementById('gif-search-input').value = '';
+    document.getElementById('gif-results').innerHTML = '';
+    document.getElementById('gif-status').textContent = '';
+    document.getElementById('edit-profile').classList.add('open');
+  };
+
+  window.closeModal = function(id) {
+    document.getElementById(id).classList.remove('open');
+  };
+
+  window.handleAvatarUpload = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const max = 128;
+        let w = img.width, h = img.height;
+        if (w > h) { h = Math.round(h * max / w); w = max; } else { w = Math.round(w * max / h); h = max; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        newAvatarBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        document.getElementById('edit-avatar-preview').src = newAvatarBase64;
+      };
+      img.onerror = () => alert('Could not load that image.');
+      img.src = e.target.result;
+    };
+    reader.onerror = () => alert('Could not read that file.');
+    reader.readAsDataURL(file);
+  };
+
+  window.saveProfile = async function() {
+    const username = document.getElementById('edit-username').value.trim() || 'Anonymous';
+    const bio = document.getElementById('edit-bio').value.trim();
+    const status = document.getElementById('edit-status').value;
+    if (newAvatarBase64) profile.avatar = newAvatarBase64;
+    profile.username = username;
+    profile.bio = bio;
+    profile.status = status;
+    try {
+      localStorage.setItem('surge_username', username);
+      localStorage.setItem('surge_banner', profile.bannerColor);
+      localStorage.setItem('surge_bio', bio);
+      localStorage.setItem('surge_status', status);
+      if (profile.avatar) localStorage.setItem('surge_avatar', profile.avatar);
+    } catch (err) {
+      console.error('Failed to cache profile locally:', err);
+    }
+    updateSidebarProfile();
+    await savePresence();
+    if (pendingBanner !== undefined) {
+      profile.bannerImage = pendingBanner;
+      try {
+        await set(ref(db, 'banners/' + currentUser.uid), pendingBanner || null);
+      } catch (err) {
+        console.error('Failed to save banner image:', err);
+        alert('Could not save banner image.');
+      }
+      pendingBanner = undefined;
+    }
+    closeModal('edit-profile');
+  };
+
+  function renderOnlineUsers() {
+    const el = document.getElementById('online-users');
+    if (!el) return;
+    el.innerHTML = '';
+    const entries = { ...window._presenceSnap };
+    if (currentUser) {
+      entries[currentUser.uid] = {
+        ...(entries[currentUser.uid] || {}),
+        username: profile.username,
+        bio: profile.bio,
+        avatar: profile.avatar,
+        bannerColor: profile.bannerColor,
+        status: profile.status,
+        online: true,
+        lastSeen: Date.now()
+      };
+    }
+    let count = 0;
+    Object.entries(entries).forEach(([uid, data]) => {
+      if (!data.online || data.status === 'offline' || isStale(data)) return;
+      count++;
+      const div = document.createElement('div');
+      div.className = 'user-item';
+      div.dataset.uid = uid;
+      const avatarImg = document.createElement('img');
+      avatarImg.className = 'user-avatar';
+      avatarImg.src = avatarUrl(data);
+      const dotSpan = document.createElement('span');
+      dotSpan.className = 'user-dot ' + statusColor(data.status);
+      dotSpan.title = (STATUS_META[data.status] || STATUS_META.offline).label;
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = data.username;
+      div.append(avatarImg, dotSpan, nameSpan);
+      if (uid !== currentUser?.uid) div.onclick = () => showProfile(uid, data);
+      el.appendChild(div);
+    });
+    const countEl = document.getElementById('online-count');
+    if (countEl) countEl.textContent = count;
+  }
+
+  function loadOnlineUsers() {
+    onValue(ref(db, 'presence'), (snap) => {
+      const val = snap.val() || {};
+      window._presenceSnap = val;
+      Object.entries(val).forEach(([uid, data]) => {
+        const dmLabel = dmLabelEls[uid];
+        if (dmLabel) dmLabel.textContent = data.username;
+      });
+      renderOnlineUsers();
+      syncMessageAuthors();
+      window.decorateAvatars?.();
+    });
+    if (!onlineListTicker) {
+      onlineListTicker = setInterval(renderOnlineUsers, 15000);
+    }
+  }
+
+  function syncMessageAuthors() {
+    messageEls.forEach((div, id) => {
+      const uid = div.dataset.uid;
+      const live = window._presenceSnap[uid];
+      if (!live) return;
+      const nameSpan = div.querySelector('.meta span');
+      const avatarImg = div.querySelector('.msg-avatar');
+      if (nameSpan && live.username) {
+        nameSpan.dataset.name = live.username;
+        nameSpan.className = '';
+        nameSpan.style.cssText = 'cursor:pointer;';
+        nameSpan.textContent = live.username;
+      }
+      if (avatarImg && live.avatar && avatarImg.dataset.src !== live.avatar) {
+        avatarImg.dataset.src = live.avatar;
+        avatarImg.src = live.avatar;
+      }
+    });
+  }
+
+  window.showProfile = async function(uid, data) {
+    viewingUID = uid;
+    const d = data || window._presenceSnap[uid] || (await get(ref(db, 'presence/' + uid))).val();
+    if (!d) return;
+    document.getElementById('vp-avatar').src = avatarUrl(d);
+    const bannerEl = document.getElementById('vp-banner');
+    bannerEl.style.background = bannerBg(d.bannerColor);
+    window.applyProfileCosmetics?.(d);
+    const nameEl = document.getElementById('vp-name');
+    nameEl.className = '';
+    nameEl.textContent = d.username;
+    document.getElementById('vp-status').innerHTML = statusLabel(d.status);
+    document.getElementById('vp-bio').textContent = d.bio || 'No bio yet.';
+    const isSelf = uid === currentUser?.uid;
+    document.getElementById('vp-status').style.display = isSelf ? 'none' : 'inline-block';
+    document.getElementById('dm-btn').style.display = isSelf ? 'none' : 'block';
+    document.getElementById('vp-self-menu').style.display = isSelf ? 'block' : 'none';
+    if (isSelf) {
+      document.getElementById('vp-status-text').innerHTML = statusLabel(profile.status);
+      document.getElementById('vp-status-picker').classList.remove('open');
+      renderAccountRow();
+    }
+
+    document.getElementById('view-profile').classList.add('open');
+
+    let bImg = '';
+    if (isSelf) bImg = profile.bannerImage;
+    else {
+      try { bImg = (await get(ref(db, 'banners/' + uid))).val() || ''; } catch (e) {}
+    }
+    if (viewingUID === uid && bImg && !d.shopBanner) bannerEl.style.background = bannerBg(d.bannerColor, bImg);
+  };
+
+  function renderAccountRow() {
+    if (!currentUser) return;
+    const iconEl = document.getElementById('vp-account-icon');
+    const textEl = document.getElementById('vp-account-text');
+    if (currentUser.isAnonymous) {
+      iconEl.innerHTML = '<i class="fa-brands fa-google"></i>';
+      textEl.textContent = 'Sign in with Google';
+    } else {
+      iconEl.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i>';
+      textEl.textContent = 'Sign out (' + (currentUser.displayName || currentUser.email || 'Google account') + ')';
+    }
+  }
+
+  window.handleAccountRowClick = function() {
+    if (currentUser && currentUser.isAnonymous) {
+      signInWithGoogle();
+    } else {
+      signOutToGuest();
+    }
+  };
+
+  window.toggleStatusPicker = function(event) {
+    event.stopPropagation();
+    document.getElementById('vp-status-picker').classList.toggle('open');
+  };
+
+  window.quickSetStatus = async function(event, status) {
+    event.stopPropagation();
+    profile.status = status;
+    try { localStorage.setItem('surge_status', status); } catch (e) {}
+    document.getElementById('vp-status-text').innerHTML = statusLabel(status);
+    document.getElementById('vp-status-picker').classList.remove('open');
+    updateSidebarProfile();
+    await savePresence();
+  };
+
+  document.addEventListener('click', () => {
+    document.getElementById('vp-status-picker')?.classList.remove('open');
+    document.getElementById('edit-status-menu')?.classList.remove('open');
+  });
+
+  window.startDMFromProfile = function() {
+    closeModal('view-profile');
+    if (viewingUID && window._presenceSnap[viewingUID]) {
+      openDM(viewingUID, window._presenceSnap[viewingUID].username);
+    }
+  };
+
+  window.editProfileFromView = function() {
+    closeModal('view-profile');
+    openEditProfile();
+  };
+
+  window.openMyProfile = function() {
+    if (!currentUser) return;
+    showProfile(currentUser.uid, profile);
+  };
+
+  const CHANNEL_ICONS = { global: 'fa-globe', gaming: 'fa-gamepad', random: 'fa-cloud', shop: 'fa-cart-shopping' };
+
+  window.openChannel = function(channel) {
+    clearOwnTyping();
+    currentChannel = channel;
+    const icon = CHANNEL_ICONS[channel] || 'fa-hashtag';
+    document.getElementById('channel-title').innerHTML = `<i class="fa-solid ${icon}"></i> ${channel}`;
+    document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
+    const tab = document.querySelector('.channel[data-channel="' + channel + '"]');
+    if (tab) tab.classList.add('active');
+
+    const isShop = channel === 'shop';
+    document.getElementById('messages').style.display = isShop ? 'none' : 'flex';
+    document.getElementById('input-area').style.display = isShop ? 'none' : 'flex';
+    document.getElementById('reply-preview').style.display = 'none';
+    document.getElementById('mod-warning').style.display = 'none';
+    document.getElementById('typing-indicator').classList.remove('show');
+    document.getElementById('shop-placeholder').style.display = isShop ? 'flex' : 'none';
+
+    if (isShop) {
+      if (currentMessagesQuery) { off(currentMessagesQuery); currentMessagesQuery = null; }
+      if (currentTypingRef) { off(currentTypingRef); currentTypingRef = null; }
+      messageEls.clear();
+      return;
+    }
+
+    loadMessages('channels/' + channel + '/messages');
+    loadTypingIndicator(channel);
+  };
+
+  window.openDM = function(uid, name) {
+    if (!currentUser || uid === currentUser.uid) return;
+    clearOwnTyping();
+    const dmId = [currentUser.uid, uid].sort().join('_');
+    currentChannel = 'dm_' + dmId;
+    const titleEl = document.getElementById('channel-title');
+    titleEl.innerHTML = '<i class="fa-solid fa-message"></i> ';
+    titleEl.appendChild(document.createTextNode(name));
+    document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
+    let entry = document.getElementById('dm_' + dmId);
+    if (!entry) entry = addDmListEntry(uid, name);
+    entry.classList.add('active');
+    document.getElementById('messages').style.display = 'flex';
+    document.getElementById('input-area').style.display = 'flex';
+    document.getElementById('shop-placeholder').style.display = 'none';
+    loadMessages('dms/' + dmId + '/messages');
+    loadTypingIndicator(currentChannel);
+    saveDmContact(uid, name);
+  };
+
+  function addDmListEntry(uid, name) {
+    const dmList = document.getElementById('dm-list');
+    const div = document.createElement('div');
+    div.className = 'channel dm';
+    div.id = 'dm_' + [currentUser.uid, uid].sort().join('_');
+
+    const icon = document.createElement('i');
+    icon.className = 'fa-solid fa-message channel-icon';
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = name;
+
+    div.append(icon, nameSpan);
+    div.onclick = () => openDM(uid, nameSpan.textContent || name);
+    dmList.appendChild(div);
+    dmLabelEls[uid] = nameSpan;
+    return div;
+  }
+
+  async function saveDmContact(theirUid, theirUsername) {
+    try {
+      await set(ref(db, 'dmContacts/' + currentUser.uid + '/' + theirUid), {
+        uid: theirUid,
+        username: theirUsername,
+        updatedAt: Date.now(),
+      });
+      await set(ref(db, 'dmContacts/' + theirUid + '/' + currentUser.uid), {
+        uid: currentUser.uid,
+        username: profile.username,
+        updatedAt: Date.now(),
+      });
+    } catch (err) {
+      console.error('Failed to save DM:', err);
+    }
+  }
+
+  async function loadDmContacts() {
+    try {
+      const snap = await get(ref(db, 'dmContacts/' + currentUser.uid));
+      const val = snap.val() || {};
+      Object.values(val).forEach((contact) => {
+        const dmId = [currentUser.uid, contact.uid].sort().join('_');
+        if (!document.getElementById('dm_' + dmId)) {
+          const live = window._presenceSnap[contact.uid];
+          addDmListEntry(contact.uid, (live && live.username) || contact.username);
+        }
+      });
+    } catch (err) {
+      console.error('Failed to load DM contacts:', err);
+    }
+  }
+
+  function buildMessageEl(id, data) {
+    const live = window._presenceSnap[data.uid];
+    const displayName = (live && live.username) || data.username;
+    const displayAvatar = (live && live.avatar) ? live.avatar : (data.avatar || DEFAULT_AVATAR);
+    const div = document.createElement('div');
+    div.className = 'message' + (data.uid === currentUser?.uid ? ' mine' : '');
+    div.dataset.uid = data.uid;
+    const time = data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : '';
+    const avatarImg = document.createElement('img');
+    avatarImg.className = 'msg-avatar';
+    avatarImg.dataset.src = displayAvatar;
+    avatarImg.src = displayAvatar;
+    avatarImg.onclick = () => showProfile(data.uid, live || null);
+    const body = document.createElement('div');
+    body.className = 'msg-body';
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const nameSpan = document.createElement('span');
+    nameSpan.dataset.name = displayName;
+    nameSpan.textContent = displayName;
+    nameSpan.onclick = () => showProfile(data.uid, live || null);
+
+    meta.appendChild(nameSpan);
+    meta.appendChild(document.createTextNode(time));
+
+    const replyBtn = document.createElement('span');
+    replyBtn.className = 'reply-btn';
+    replyBtn.innerHTML = '<i class="fa-solid fa-reply"></i>reply';
+    replyBtn.onclick = () => startReply(id, displayName, data.text);
+    meta.appendChild(replyBtn);
+
+    if (data.replyTo) {
+      const quote = document.createElement('div');
+      quote.className = 'reply-quote';
+      const quoteIcon = document.createElement('i');
+      quoteIcon.className = 'fa-solid fa-share fa-flip-vertical';
+      quote.append(quoteIcon, document.createTextNode(`${data.replyTo.username}: ${data.replyTo.text}`));
+      body.appendChild(quote);
+    }
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'text';
+    renderMentionText(textDiv, data.text);
+    if (mentionsMe(data.text)) div.classList.add('pinged');
+    if (data.uid === CRISIS_BOT_UID) div.classList.add('bot-crisis');
+    body.append(meta, textDiv);
+    div.append(avatarImg, body);
+    return div;
+  }
+
+  function renderMentionText(el, text) {
+    el.innerHTML = '';
+    const re = /@([A-Za-z0-9_]{1,32})/g;
+    let lastIndex = 0;
+    let match;
+    while ((match = re.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        el.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+      }
+      const mentioned = match[1];
+      const span = document.createElement('span');
+      span.className = 'mention' + (isMe(mentioned) ? ' mention-me' : '');
+      span.textContent = '@' + mentioned;
+      el.appendChild(span);
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < text.length) {
+      el.appendChild(document.createTextNode(text.slice(lastIndex)));
+    }
+  }
+
+  function isMe(name) {
+    return (profile.username || '').trim().toLowerCase() === (name || '').trim().toLowerCase();
+  }
+
+  function mentionsMe(text) {
+    const re = /@([A-Za-z0-9_]{1,32})/g;
+    let match;
+    while ((match = re.exec(text)) !== null) {
+      if (isMe(match[1])) return true;
+    }
+    return false;
+  }
+
+  if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+    Notification.requestPermission().catch(() => {});
+  }
+
+  function playPingSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.value = 0.15;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (err) {
+
+    }
+  }
+
+  function notifyPing(data) {
+    playPingSound();
+    if (document.visibilityState !== 'visible') {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        try {
+          const n = new Notification(`${data.username} pinged you`, {
+            body: data.text,
+            icon: data.avatar || DEFAULT_AVATAR,
+          });
+          n.onclick = () => { window.focus(); n.close(); };
+        } catch (err) {
+          console.error('Failed to load notification:', err);
+        }
+      }
+    }
+  }
+
+  let currentMessagesQuery = null;
+
+  async function loadMessages(path) {
+    if (currentMessagesQuery) off(currentMessagesQuery);
+    messageEls.clear();
+    const el = document.getElementById('messages');
+    el.innerHTML = '';
+
+    const q = query(ref(db, path), orderByChild('timestamp'), limitToLast(100));
+    currentMessagesQuery = q;
+
+    try {
+      const snap = await get(q);
+      snap.forEach(child => {
+        const id = child.key;
+        const data = child.val();
+        const newEl = buildMessageEl(id, data);
+        el.appendChild(newEl);
+        messageEls.set(id, newEl);
+      });
+      el.scrollTop = el.scrollHeight;
+    } catch (err) {
+      console.error('Failed to load messages for', path, err);
+      el.innerHTML = '';
+      const errDiv = document.createElement('div');
+      errDiv.style.color = '#f87171';
+      errDiv.style.fontSize = '13px';
+      errDiv.style.padding = '8px';
+      errDiv.textContent = 'Failed to load (' + (err.code || err.message || 'unknown error') + ').';
+      el.appendChild(errDiv);
+      return;
+    }
+
+    if (currentMessagesQuery !== q) return;
+
+    onChildAdded(q, (snap) => {
+      const id = snap.key;
+      if (messageEls.has(id)) return;
+      const data = snap.val();
+      if (!data) return;
+      const elc = document.getElementById('messages');
+      const newEl = buildMessageEl(id, data);
+      elc.appendChild(newEl);
+      messageEls.set(id, newEl);
+      elc.scrollTop = elc.scrollHeight;
+      if (data.uid !== currentUser?.uid && mentionsMe(data.text)) {
+        notifyPing(data);
+      }
+    });
+    onChildChanged(q, (snap) => {
+      const id = snap.key;
+      const data = snap.val();
+      if (!data) return;
+      const newEl = buildMessageEl(id, data);
+      const oldEl = messageEls.get(id);
+      if (oldEl) oldEl.replaceWith(newEl);
+      messageEls.set(id, newEl);
+    });
+    onChildRemoved(q, (snap) => {
+      const id = snap.key;
+      messageEls.get(id)?.remove();
+      messageEls.delete(id);
+    });
+  }
+
+  let currentTypingRef = null;
+  let typingHideTimer = null;
+  let lastTypingWrite = 0;
+
+  function loadTypingIndicator(channel) {
+    if (currentTypingRef) off(currentTypingRef);
+    const tRef = ref(db, 'typing/' + channel);
+    currentTypingRef = tRef;
+    onValue(tRef, (snap) => {
+      const val = snap.val() || {};
+      const now = Date.now();
+      const names = Object.entries(val)
+        .filter(([uid, data]) => uid !== currentUser?.uid && data && typeof data.ts === 'number' && (now - data.ts) < 5000)
+        .map(([, data]) => data.username);
+      renderTypingIndicator(names);
+    });
+  }
+
+  function renderTypingIndicator(names) {
+    const el = document.getElementById('typing-indicator');
+    if (!names.length) { el.classList.remove('show'); return; }
+    let text;
+    if (names.length === 1) text = `${names[0]} is typing`;
+    else if (names.length === 2) text = `${names[0]} and ${names[1]} are typing`;
+    else text = `${names.length} people are typing`;
+    document.getElementById('typing-indicator-text').textContent = text;
+    el.classList.add('show');
+  }
+
+  window.notifyTyping = function() {
+    if (!currentUser) return;
+    const myTypingRef = ref(db, 'typing/' + currentChannel + '/' + currentUser.uid);
+    const now = Date.now();
+    if (now - lastTypingWrite > 2000) {
+      lastTypingWrite = now;
+      set(myTypingRef, { username: profile.username, ts: serverTimestamp() });
+      onDisconnect(myTypingRef).remove();
+    }
+    clearTimeout(typingHideTimer);
+    typingHideTimer = setTimeout(() => { set(myTypingRef, null); }, 3000);
+  };
+
+  function clearOwnTyping() {
+    if (!currentUser) return;
+    clearTimeout(typingHideTimer);
+    lastTypingWrite = 0;
+    set(ref(db, 'typing/' + currentChannel + '/' + currentUser.uid), null);
+  }
+
+  let mentionActiveIndex = -1;
+  let mentionMatches = [];
+
+  function getMentionCandidates() {
+    const seen = new Set();
+    const list = [];
+    Object.values(window._presenceSnap || {}).forEach(p => {
+      const key = (p.username || '').toLowerCase();
+      if (p.username && !seen.has(key)) {
+        seen.add(key);
+        list.push(p);
+      }
+    });
+    return list;
+  }
+
+  function currentMentionQuery() {
+    const input = document.getElementById('msg-input');
+    const cursor = input.selectionStart;
+    const upToCursor = input.value.slice(0, cursor);
+    const match = upToCursor.match(/@([A-Za-z0-9_]{0,32})$/);
+    return match ? match[1] : null;
+  }
+
+  window.handleMentionInput = function() {
+    hideModWarning();
+    const query = currentMentionQuery();
+    const dropdown = document.getElementById('mention-dropdown');
+
+    if (query === null) {
+      dropdown.style.display = 'none';
+      mentionMatches = [];
+      mentionActiveIndex = -1;
+      return;
+    }
+
+    mentionMatches = getMentionCandidates().filter(p =>
+      p.username.toLowerCase().startsWith(query.toLowerCase())
+    ).slice(0, 8);
+
+    if (mentionMatches.length === 0) {
+      dropdown.style.display = 'none';
+      return;
+    }
+
+    mentionActiveIndex = 0;
+    renderMentionDropdown();
+  };
+
+  function renderMentionDropdown() {
+    const dropdown = document.getElementById('mention-dropdown');
+    dropdown.innerHTML = '';
+    mentionMatches.forEach((p, i) => {
+      const opt = document.createElement('div');
+      opt.className = 'mention-option' + (i === mentionActiveIndex ? ' active' : '');
+      const img = document.createElement('img');
+      img.src = p.avatar || DEFAULT_AVATAR;
+      const span = document.createElement('span');
+      span.textContent = p.username;
+      opt.append(img, span);
+      opt.onclick = () => selectMention(i);
+      dropdown.appendChild(opt);
+    });
+    dropdown.style.display = 'block';
+  }
+
+  function selectMention(index) {
+    const input = document.getElementById('msg-input');
+    const username = mentionMatches[index].username;
+    const cursor = input.selectionStart;
+    const upToCursor = input.value.slice(0, cursor);
+    const afterCursor = input.value.slice(cursor);
+    const newUpToCursor = upToCursor.replace(/@([A-Za-z0-9_]{0,32})$/, '@' + username + ' ');
+    input.value = newUpToCursor + afterCursor;
+    const newCursorPos = newUpToCursor.length;
+    input.focus();
+    input.setSelectionRange(newCursorPos, newCursorPos);
+    document.getElementById('mention-dropdown').style.display = 'none';
+    mentionMatches = [];
+    mentionActiveIndex = -1;
+  }
+
+  window.handleMsgInputKeydown = function(event) {
+    const dropdown = document.getElementById('mention-dropdown');
+    const dropdownOpen = dropdown.style.display === 'block' && mentionMatches.length > 0;
+
+    if (dropdownOpen) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        mentionActiveIndex = (mentionActiveIndex + 1) % mentionMatches.length;
+        renderMentionDropdown();
+        return;
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        mentionActiveIndex = (mentionActiveIndex - 1 + mentionMatches.length) % mentionMatches.length;
+        renderMentionDropdown();
+        return;
+      }
+      if ((event.key === 'Enter' && !event.isComposing) || event.key === 'Tab') {
+        event.preventDefault();
+        selectMention(mentionActiveIndex);
+        return;
+      }
+      if (event.key === 'Escape') {
+        dropdown.style.display = 'none';
+        mentionMatches = [];
+        mentionActiveIndex = -1;
+        return;
+      }
+    }
+
+    if (event.key === 'Enter' && !event.isComposing) sendMessage();
+  };
+
+  let replyingTo = null;
+
+  window.startReply = function(id, username, text) {
+    replyingTo = { id, username, text: text.length > 80 ? text.slice(0, 80) + '…' : text };
+    document.getElementById('reply-preview-text').textContent = `Replying to ${username}: ${replyingTo.text}`;
+    document.getElementById('reply-preview').style.display = 'flex';
+    document.getElementById('msg-input').focus();
+  };
+
+  window.cancelReply = function() {
+    replyingTo = null;
+    document.getElementById('reply-preview').style.display = 'none';
+  };
+
+  window.sendMessage = async function() {
+    const input = document.getElementById('msg-input');
+    const sendBtn = document.getElementById('send-btn');
+    const text = input.value.trim();
+    if (!text || !currentUser) return;
+
+    document.getElementById('mention-dropdown').style.display = 'none';
+    clearOwnTyping();
+    hideModWarning();
+    input.disabled = true;
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Sending…'; }
+
+    const result = await moderateMessage(text);
+
+    if (result.blocked) {
+      input.disabled = false;
+      if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send'; }
+      showModWarning(result.categories);
+      input.focus();
+      return;
+    }
+
+    input.value = '';
+    input.disabled = false;
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send'; }
+    const pendingReply = replyingTo;
+    window.cancelReply();
+    const path = currentChannel.startsWith('dm_')
+      ? 'dms/' + currentChannel.replace('dm_', '') + '/messages'
+      : 'channels/' + currentChannel + '/messages';
+    try {
+      const newRef = push(ref(db, path));
+      await set(newRef, {
+        text,
+        username: profile.username,
+        uid: currentUser.uid,
+        avatar: profile.avatar,
+        ...(pendingReply ? { replyTo: pendingReply } : {}),
+        timestamp: serverTimestamp()
+      });
+      if (result.crisisRisk) {
+        sendCrisisBotMessage(path, profile.username);
+      }
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      input.value = text;
+    }
+  };
+
+  function showModWarning(categories) {
+    const el = document.getElementById('mod-warning');
+    const label = (categories && categories.length) ? categories.join(', ').replace(/_/g, ' ') : 'policy violation';
+    document.getElementById('mod-warning-text').textContent = `Message blocked (${label}). Please rephrase.`;
+    el.style.display = 'flex';
+  }
+
+  window.hideModWarning = function() {
+    document.getElementById('mod-warning').style.display = 'none';
+  };
+  function hideModWarning() { window.hideModWarning(); }
+
+  function setupPresenceConnection() {
+    onValue(ref(db, '.info/connected'), (snap) => {
+      if (snap.val() === false || !currentUser) return;
+      const myRef = ref(db, 'presence/' + currentUser.uid);
+
+      onDisconnect(myRef).update({ online: false, status: 'offline', lastSeen: serverTimestamp() })
+        .then(() => savePresence());
+    });
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      try {
+        const existing = await get(ref(db, 'presence/' + currentUser.uid));
+        if (existing.exists()) {
+          const saved = existing.val();
+          profile.username = saved.username || profile.username;
+          profile.bio = saved.bio || '';
+          profile.avatar = saved.avatar || '';
+          if (!VALID_STATUSES.includes(localStorage.getItem('surge_status'))) {
+            profile.status = (saved.status && saved.status !== 'offline') ? saved.status : 'online';
+          }
+          profile.bannerColor = saved.bannerColor || profile.bannerColor;
+          profile.avatarDecoration = saved.avatarDecoration || '';
+          profile.profileEffect = saved.profileEffect || '';
+          profile.shopBanner = saved.shopBanner || '';
+        }
+      } catch (err) {
+        console.error('Failed to restore existing profile:', err);
+      }
+
+      try {
+        profile.bannerImage = (await get(ref(db, 'banners/' + currentUser.uid))).val() || '';
+      } catch (err) {
+        console.error('Failed to load banner:', err);
+      }
+
+      localStorage.setItem('surge_username', profile.username);
+
+      updateSidebarProfile();
+      setupPresenceConnection();
+      loadOnlineUsers();
+      loadMessages('channels/global/messages');
+      loadTypingIndicator('global');
+      loadDmContacts();
+      if (heartbeatTimer) clearInterval(heartbeatTimer);
+      heartbeatTimer = setInterval(savePresence, HEARTBEAT_INTERVAL_MS);
+    }
+  });
+
+  window.signInWithGoogle = async function() {
+    if (!currentUser) return;
+    const provider = new GoogleAuthProvider();
+    try {
+      if (currentUser.isAnonymous) {
+        const result = await linkWithPopup(currentUser, provider);
+        const gUser = result.user;
+        if ((profile.username === 'Anonymous' || !profile.username) && gUser.displayName) {
+          profile.username = gUser.displayName;
+        }
+        if (!profile.avatar && gUser.photoURL) profile.avatar = gUser.photoURL;
+        try {
+          localStorage.setItem('surge_username', profile.username);
+          if (profile.avatar) localStorage.setItem('surge_avatar', profile.avatar);
+        } catch (err) { console.error('Failed to cache profile locally:', err); }
+        updateSidebarProfile();
+        await savePresence();
+        renderAccountRow();
+      } else {
+        await signInWithPopup(auth, provider);
+        location.reload();
+      }
+    } catch (err) {
+      if (err.code === 'auth/credential-already-in-use') {
+        try {
+          const cred = GoogleAuthProvider.credentialFromError(err);
+          await signInWithCredential(auth, cred);
+          location.reload();
+        } catch (err2) {
+          console.error('Failed to sign in :', err2);
+          alert('Could not sign in with that Google account. Please try again.');
+        }
+      } else if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+      } else {
+        console.error('Google sign-in failed:', err);
+        alert('Could not sign in with Google (' + (err.code || 'unknown error') + '). If this site is hosted on an Unauthorized domain, this is a expected error.');
+      }
+    }
+  };
+
+  window.signOutToGuest = async function() {
+    const ok = confirm('Sign out? Your linked data stays saved: but this browser will switch to a brand new anonymous guest until you do.');
+    if (!ok) return;
+    try {
+      await signOut(auth);
+      location.reload();
+    } catch (err) {
+      console.error('Sign out failed:', err);
+    }
+  };
+
+  setPersistence(auth, browserLocalPersistence)
+    .catch(err => console.error('Failed to set auth persistence:', err))
+    .finally(() => {
+      signInAnonymously(auth).catch(err => {
+        console.error('Anonymous sign-in failed:', err);
+        alert('Could not connect to chat. Please refresh the page.');
+      });
+    });
+
+  function markOffline() {
+    if (currentUser) {
+      update(ref(db, 'presence/' + currentUser.uid), { online: false, status: 'offline' });
+    }
+  }
+
+  window.addEventListener('beforeunload', markOffline);
+  window.addEventListener('pagehide', markOffline);
+
+  window.__chat = { profile, savePresence, DEFAULT_AVATAR };
+</script>
+
+<script type="module">
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+  const API = '/api/shop';
+  const BASE = '/assets/effects/';
+  const SPIN_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+  const TABS = [
+    { id: 'all',    label: 'All' },
+    { id: 'avatar', label: 'Avatar decorations' },
+    { id: 'effect', label: 'Profile effects' },
+    { id: 'banner', label: 'Banners' }
+  ];
+  const TYPE_LABEL = { avatar: 'Avatar decoration', effect: 'Profile effect', banner: 'Banner' };
+  const FIELD = { avatar: 'avatarDecoration', effect: 'profileEffect', banner: 'shopBanner' };
+
+  const auth = getAuth();
+  const db = getDatabase();
+
+  let items = [];
+  let itemsLoaded = false;
+  let state = { coins: 0, owned: {}, equipped: {}, lastSpinAt: 0, nextSpinAt: 0, prizes: [] };
+  let walletStatus = 'loading';
+  let tab = 'all';
+  let busy = false;
+  let unsubWallet = null;
+
+  async function api(action, body = {}) {
+    const user = auth.currentUser;
+    if (!user) throw new Error('Not signed in yet, try again in a second.');
+    const token = await user.getIdToken();
+    let res;
+    try {
+      res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ action, ...body })
+      });
+    } catch (e) {
+      throw new Error('Could not reach the shop server (/api/shop).');
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const e = new Error(data.error || `Shop server error (${res.status}). Is /api/shop deployed?`);
+      e.data = data;
+      throw e;
+    }
+    return data;
+  }
+
+  function normalize(v) {
+    v = v || {};
+    const last = v.lastSpinAt || 0;
+    return {
+      coins: v.coins || 0,
+      owned: v.owned || {},
+      equipped: v.equipped || {},
+      lastSpinAt: last,
+      nextSpinAt: last ? last + SPIN_COOLDOWN_MS : 0
+    };
+  }
+
+  function setState(v) {
+    state = { ...state, ...v };
+    walletStatus = 'ok';
+    syncProfileFromEquipped();
+    afterStateChange();
+  }
+
+  function afterStateChange() {
+    if (isShopOpen()) render();
+    renderInventory();
+    decorateAvatars();
+    window.dispatchEvent(new CustomEvent('shop-wallet', {
+      detail: { coins: state.coins, nextSpinAt: state.nextSpinAt, status: walletStatus }
+    }));
+  }
+  window.shopWallet = () => ({ coins: state.coins, nextSpinAt: state.nextSpinAt, status: walletStatus });
+
+  function watchWallet(uid) {
+    if (unsubWallet) unsubWallet();
+    walletStatus = 'loading';
+    unsubWallet = onValue(ref(db, 'shop/' + uid), (snap) => {
+      setState(normalize(snap.val()));
+    }, (err) => {
+      console.error('Could not read shop balance:', err);
+      walletStatus = 'error';
+      afterStateChange();
+    });
+  }
+
+  const slug = f => String(f).toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+
+  function loadItems() {
+    items = [...document.querySelectorAll('.shop-item')].map(el => {
+      const d = el.dataset;
+      return {
+        id: slug(d.file || ''),
+        type: d.type,
+        name: d.name || d.file,
+        desc: d.desc || '',
+        price: parseInt(d.price, 10) || 0,
+        file: d.file,
+        url: BASE + d.file
+      };
+    }).filter(it => it.file && FIELD[it.type]);
+    itemsLoaded = true;
+    syncProfileFromEquipped();
+    afterStateChange();
+  }
+
+  function syncProfileFromEquipped() {
+    const chat = window.__chat;
+    if (!chat || !itemsLoaded || walletStatus !== 'ok') return;
+    let changed = false;
+    for (const type of Object.keys(FIELD)) {
+      const id = state.equipped && state.equipped[type];
+      const it = id ? items.find(i => i.id === id) : null;
+      const url = it ? it.url : '';
+      if ((chat.profile[FIELD[type]] || '') !== url) {
+        chat.profile[FIELD[type]] = url;
+        changed = true;
+      }
+    }
+    if (changed) chat.savePresence();
+  }
+
+  async function buy(it) {
+    if (busy) return;
+    if (state.owned[it.id]) return;
+    if ((state.coins || 0) < it.price) return;
+    busy = true;
+    try {
+      const r = await api('buy', { id: it.id });
+      setState(r);
+      busy = false;
+      showEquipPrompt(it);
+    } catch (err) {
+      busy = false;
+      alert(err.message);
+    }
+  }
+
+  async function setEquip(type, id) {
+    if (busy) return;
+    busy = true;
+    try {
+      const r = await api('equip', { type, id: id || null });
+      setState(r);
+    } catch (err) {
+      alert(err.message);
+    }
+    busy = false;
+  }
+
+  window.shopSpin = async function () {
+    const r = await api('spin');
+    setState(r);
+    return r;
+  };
+  window.shopSpinStatus = async function () {
+    const s = await api('state');
+    setState(s);
+    return { ready: Date.now() >= (s.nextSpinAt || 0), nextSpinAt: s.nextSpinAt, prizes: s.prizes };
+  };
+
+  const style = document.createElement('style');
+  style.textContent = `
+  #shop-placeholder.shop-root { display:none; flex-direction:column; align-items:stretch; justify-content:flex-start;
+    font-size:14px; font-weight:400; overflow-y:auto; padding:16px; gap:14px; }
+  .shop-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .shop-tab { background:transparent; border:1px solid #2e2f34; color:#dbdee1; padding:6px 14px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; font-family:inherit; }
+  .shop-tab:hover { background:var(--d-hover); }
+  .shop-tab.active { background:#f9a8ff; border-color:#f9a8ff; color:#1a1a1a; }
+  .shop-tab small { opacity:.6; margin-left:4px; font-weight:500; }
+  .shop-coins { margin-left:auto; display:flex; align-items:center; gap:6px; font-weight:700; color:#fff; }
+  .shop-coins i, .shop-price i { color:#f472d0; }
+  .shop-sub { color:var(--d-muted); font-size:12px; }
+  .shop-sub.err { color:#ff8a8d; }
+  .shop-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+  .shop-card { border:1px solid #2a2b2f; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:6px; background:rgba(0,0,0,.18); }
+  .shop-card.locked .shop-preview > *:not(.lock-badge) { opacity:.45; filter:grayscale(.6); }
+  .shop-card.locked .shop-name, .shop-card.locked .shop-desc { opacity:.65; }
+  .shop-preview { height:170px; border-radius:10px; background:#1b1c1f; display:flex; align-items:center; justify-content:center; margin-bottom:10px; overflow:hidden; position:relative; }
+  .lock-badge { position:absolute; top:8px; right:8px; width:26px; height:26px; border-radius:50%; background:rgba(0,0,0,.65); color:#cfd0d4; display:flex; align-items:center; justify-content:center; font-size:12px; z-index:10; }
+  .shop-name { color:#fff; font-weight:700; font-size:15px; }
+  .shop-desc { color:var(--d-muted); font-size:13px; min-height:18px; }
+  .shop-foot { display:flex; align-items:center; justify-content:space-between; margin-top:8px; }
+  .shop-price { font-weight:700; color:#fff; font-size:14px; display:flex; align-items:center; gap:6px; }
+  .shop-btn { background:var(--d-hover); border:none; color:#fff; padding:8px 18px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; font-family:inherit; display:flex; align-items:center; gap:6px; }
+  .shop-btn:hover { background:var(--d-active); }
+  .shop-btn.buy { background:var(--d-blurple); } .shop-btn.buy:hover { background:#4752c4; }
+  .shop-btn.equipped { background:#23a55a; }
+  .shop-btn:disabled { opacity:.55; cursor:default; background:var(--d-hover); }
+  .shop-empty { color:var(--d-muted); padding:40px; text-align:center; }
+
+  .sp-av { position:relative; width:56px; height:56px; flex-shrink:0; }
+  .sp-av > img.base { width:100%; height:100%; border-radius:50%; object-fit:cover; background:#222; display:block; }
+  .shop-preview > .sp-av { width:76px; height:76px; }
+
+  .sp-card { position:relative; width:126px; height:150px; border-radius:8px; overflow:hidden; background:#0f1012; border:1px solid #2a2b2f; flex-shrink:0; }
+  .sp-card .sp-banner { position:absolute; left:0; top:0; width:100%; height:47px; background:linear-gradient(135deg,#5865f2,#8c54ff); background-size:cover; background-position:center; }
+  .sp-card .sp-av { position:absolute; left:50%; top:31px; width:32px; height:32px; transform:translateX(-50%); z-index:3; }
+  .sp-card .sp-av > img.base { box-shadow:0 0 0 3px #0f1012; }
+  .sp-card .sp-you { position:absolute; left:0; right:0; top:72px; text-align:center; font-size:12px; font-weight:700; color:#fff; }
+
+  .banner-clip { position:absolute; inset:0; overflow:hidden; border-radius:inherit; z-index:0; pointer-events:none; }
+  .banner-vid { width:100%; height:100%; object-fit:cover; display:block; }
+  .deco-layer { position:absolute; left:-10%; top:-10%; width:120%; height:120%; object-fit:contain; pointer-events:none; z-index:4; border-radius:0; background:none; border:0; }
+  .fx-layer { position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover; object-position:center top; pointer-events:none; z-index:6; border-radius:0; }
+  .banner-avatar-wrap img.deco-layer, .banner-avatar-wrap video.deco-layer { position:absolute; left:-10%; top:-10%; width:120%; height:120%; object-fit:contain; border-radius:0; background:none; border:0; }
+  #view-profile .modal-box { position:relative; }
+
+  .av-wrap { position:relative; display:inline-flex; flex-shrink:0; line-height:0; }
+
+  .inv-label { font-size:12px; color:var(--d-dim); text-transform:uppercase; font-weight:700; letter-spacing:.02em; margin:2px 0 8px; }
+  .inv-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .inv-tile { width:68px; height:80px; border:2px solid transparent; border-radius:8px; background:#1b1c1f; padding:0; cursor:pointer; overflow:hidden; position:relative; display:flex; align-items:center; justify-content:center; color:var(--d-muted); font-size:12px; font-family:inherit; }
+  .inv-tile:hover { border-color:#555; }
+  .inv-tile.selected { border-color:var(--d-blurple); box-shadow:0 0 0 1px var(--d-blurple); }
+  .inv-tile .sp-av { width:40px; height:40px; }
+  .inv-clip { width:63px; height:75px; overflow:hidden; position:relative; }
+  .inv-clip .sp-card { transform:scale(.5); transform-origin:top left; position:absolute; left:0; top:0; }
+
+  #shop-equip-modal .modal-box { align-items:center; text-align:center; gap:14px; }
+  #shop-equip-modal p { color:var(--d-muted); font-size:14px; }
+  #shop-equip-modal .shop-preview { width:100%; margin-bottom:0; }
+  #shop-equip-modal .modal-actions { width:100%; justify-content:center; }
+  `;
+  document.head.appendChild(style);
+
+  const isVideo = u => /\.(webm|mp4)(\?|$)/i.test(u);
+
+  function media(url, cls) {
+    let el;
+    if (isVideo(url)) {
+      el = document.createElement('video');
+      el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true;
+      el.setAttribute('muted', '');
+      el.src = url;
+    } else {
+      el = document.createElement('img');
+      el.src = url; el.alt = ''; el.draggable = false;
+    }
+    el.className = cls;
+    return el;
+  }
+
+  function h(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function setBannerMedia(el, url) {
+    el.querySelectorAll('.banner-clip').forEach(e => e.remove());
+    if (isVideo(url)) {
+      const clip = h('div', 'banner-clip');
+      clip.appendChild(media(url, 'banner-vid'));
+      el.prepend(clip);
+    } else {
+      el.style.background = `url("${url}") center / cover no-repeat`;
+    }
+  }
+
+  function myAvatar() {
+    const c = window.__chat;
+    return (c && c.profile.avatar) || (c && c.DEFAULT_AVATAR) || '';
+  }
+
+  function avatarBox(decoUrl) {
+    const wrap = h('div', 'sp-av');
+    const img = h('img', 'base');
+    img.src = myAvatar();
+    wrap.appendChild(img);
+    if (decoUrl) wrap.appendChild(media(decoUrl, 'deco-layer'));
+    return wrap;
+  }
+
+  function miniCard(it) {
+    const card = h('div', 'sp-card');
+    const banner = h('div', 'sp-banner');
+    if (it.type === 'banner') setBannerMedia(banner, it.url);
+    card.appendChild(banner);
+    card.appendChild(avatarBox(null));
+    card.appendChild(h('div', 'sp-you', 'You'));
+    if (it.type === 'effect') card.appendChild(media(it.url, 'fx-layer'));
+    return card;
+  }
+
+  function previewFor(it, locked) {
+    const box = h('div', 'shop-preview');
+    if (it.type === 'avatar') box.appendChild(avatarBox(it.url));
+    else box.appendChild(miniCard(it));
+    if (locked) {
+      const b = h('div', 'lock-badge');
+      b.innerHTML = '<i class="fa-solid fa-lock"></i>';
+      box.appendChild(b);
+    }
+    return box;
+  }
+
+  function spinText() {
+    const t = state.nextSpinAt || 0;
+    if (Date.now() >= t) return 'Your daily spin is ready!';
+    const ms = t - Date.now();
+    const hrs = Math.floor(ms / 3600000), mins = Math.ceil((ms % 3600000) / 60000);
+    return `Next daily spin in ${hrs}h ${mins}m`;
+  }
+
+  const root = document.getElementById('shop-placeholder');
+  root.classList.add('shop-root');
+
+  function isShopOpen() { return root.style.display === 'flex'; }
+
+  function render() {
+    try {
+      renderInner();
+    } catch (err) {
+      console.error('Shop render failed:', err);
+      root.innerHTML = '';
+      root.appendChild(h('div', 'shop-sub err', 'Shop failed to load: ' + (err && err.message ? err.message : err)));
+    }
+  }
+
+  function renderInner() {
+    root.innerHTML = '';
+
+    const top = h('div', 'shop-top');
+    TABS.forEach(t => {
+      const n = t.id === 'all' ? items.length : items.filter(i => i.type === t.id).length;
+      const b = h('button', 'shop-tab' + (tab === t.id ? ' active' : ''));
+      b.append(t.label);
+      b.appendChild(h('small', '', String(n)));
+      b.onclick = () => { tab = t.id; render(); };
+      top.appendChild(b);
+    });
+    const coins = h('div', 'shop-coins');
+    coins.innerHTML = '<i class="fa-solid fa-coins"></i>';
+    coins.append(walletStatus === 'ok' ? (state.coins || 0).toLocaleString() : walletStatus === 'error' ? '—' : '…');
+    top.appendChild(coins);
+    root.appendChild(top);
+
+    if (walletStatus === 'error') root.appendChild(h('div', 'shop-sub err', 'Could not read your balance. Check the "shop" database rules.'));
+    else root.appendChild(h('div', 'shop-sub', spinText()));
+
+    const list = items.filter(i => tab === 'all' || i.type === tab);
+    if (!list.length) {
+      root.appendChild(h('div', 'shop-empty', itemsLoaded ? 'Nothing here yet.' : 'Loading…'));
+      return;
+    }
+
+    const grid = h('div', 'shop-grid');
+    list.forEach(it => {
+      const owned = !!state.owned[it.id];
+      const equipped = state.equipped[it.type] === it.id;
+      const locked = !owned && (walletStatus !== 'ok' || (state.coins || 0) < it.price);
+
+      const card = h('div', 'shop-card' + (locked ? ' locked' : ''));
+      card.appendChild(previewFor(it, locked));
+      card.appendChild(h('div', 'shop-name', it.name));
+      card.appendChild(h('div', 'shop-desc', it.desc || ''));
+
+      const foot = h('div', 'shop-foot');
+      const price = h('div', 'shop-price');
+      price.innerHTML = '<i class="fa-solid fa-coins"></i>';
+      price.append(it.price.toLocaleString());
+      foot.appendChild(price);
+
+      const btn = h('button', 'shop-btn');
+      if (equipped) {
+        btn.classList.add('equipped');
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Equipped';
+        btn.onclick = () => setEquip(it.type, null);
+      } else if (owned) {
+        btn.textContent = 'Equip';
+        btn.onclick = () => setEquip(it.type, it.id);
+      } else if (locked) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> Locked';
+      } else {
+        btn.classList.add('buy');
+        btn.textContent = 'Buy';
+        btn.onclick = () => buy(it);
+      }
+      foot.appendChild(btn);
+      card.appendChild(foot);
+      grid.appendChild(card);
+    });
+    root.appendChild(grid);
+  }
+
+  const equipModal = document.createElement('div');
+  equipModal.className = 'modal';
+  equipModal.id = 'shop-equip-modal';
+  equipModal.innerHTML = `
+    <div class="modal-box">
+      <h3 id="shop-equip-title"></h3>
+      <div id="shop-equip-preview" style="width:100%"></div>
+      <p>Equip it now? You can also pick it later in <b> your profile</b>.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="shop-equip-no">Maybe later</button>
+        <button class="btn-save" id="shop-equip-yes">Equip</button>
+      </div>
+    </div>`;
+  document.body.appendChild(equipModal);
+
+  let pendingEquip = null;
+  function showEquipPrompt(it) {
+    pendingEquip = it;
+    document.getElementById('shop-equip-title').textContent = `You got ${it.name}!`;
+    const pv = document.getElementById('shop-equip-preview');
+    pv.innerHTML = '';
+    pv.appendChild(previewFor(it, false));
+    equipModal.classList.add('open');
+  }
+  document.getElementById('shop-equip-no').onclick = () => { pendingEquip = null; equipModal.classList.remove('open'); };
+  document.getElementById('shop-equip-yes').onclick = async () => {
+    const it = pendingEquip;
+    pendingEquip = null;
+    equipModal.classList.remove('open');
+    if (it) await setEquip(it.type, it.id);
+  };
+
+  function invTile(it, type) {
+    const selected = it ? state.equipped[type] === it.id : !state.equipped[type];
+    const t = h('button', 'inv-tile' + (selected ? ' selected' : ''));
+    t.type = 'button';
+    t.title = it ? it.name : 'None';
+    if (!it) t.appendChild(h('span', '', 'None'));
+    else if (type === 'avatar') t.appendChild(avatarBox(it.url));
+    else {
+      const clip = h('div', 'inv-clip');
+      clip.appendChild(miniCard(it));
+      t.appendChild(clip);
+    }
+    t.onclick = () => setEquip(type, it ? it.id : null);
+    return t;
+  }
+
+  function renderInventory() {
+    const box = document.getElementById('edit-inventory');
+    if (!box) return;
+    box.innerHTML = '';
+    const mine = items.filter(i => state.owned[i.id]);
+    if (!mine.length) {
+      box.appendChild(h('div', 'shop-sub', 'Nothing yet. Items you buy in the Shop show up here.'));
+      return;
+    }
+    ['avatar', 'effect', 'banner'].forEach(type => {
+      const list = mine.filter(i => i.type === type);
+      if (!list.length) return;
+      box.appendChild(h('div', 'inv-label', TYPE_LABEL[type]));
+      const row = h('div', 'inv-row');
+      row.appendChild(invTile(null, type));
+      list.forEach(it => row.appendChild(invTile(it, type)));
+      box.appendChild(row);
+    });
+    box.appendChild(h('div', 'shop-sub', 'Changes apply right away.'));
+  }
+
+  const origOpenEditProfile = window.openEditProfile;
+  window.openEditProfile = function () {
+    origOpenEditProfile();
+    renderInventory();
+  };
+
+  const origOpenChannel = window.openChannel;
+  window.openChannel = function (channel) {
+    origOpenChannel(channel);
+    if (channel === 'shop') render();
+  };
+  new MutationObserver(() => { if (isShopOpen() && !root.firstChild) render(); })
+    .observe(root, { attributes: true, attributeFilter: ['style'] });
+  document.querySelector('.channel[data-channel="shop"]')
+    ?.addEventListener('click', () => setTimeout(() => { if (isShopOpen()) render(); }, 0));
+
+  window.applyProfileCosmetics = function (d) {
+    const box = document.querySelector('#view-profile .modal-box');
+    const banner = document.getElementById('vp-banner');
+    const wrap = banner.querySelector('.banner-avatar-wrap');
+    box.querySelectorAll('.fx-layer').forEach(e => e.remove());
+    wrap.querySelectorAll('.deco-layer').forEach(e => e.remove());
+    banner.querySelectorAll('.banner-clip').forEach(e => e.remove());
+    if (d.shopBanner) setBannerMedia(banner, d.shopBanner);
+    if (d.avatarDecoration) wrap.appendChild(media(d.avatarDecoration, 'deco-layer'));
+    if (d.profileEffect) box.prepend(media(d.profileEffect, 'fx-layer'));
+  };
+
+  function decorateImg(img, url) {
+    if (!img) return;
+    let wrap = img.parentElement && img.parentElement.classList.contains('av-wrap') ? img.parentElement : null;
+    if (!wrap) {
+      if (!url) return;
+      wrap = document.createElement('span');
+      wrap.className = 'av-wrap';
+      img.replaceWith(wrap);
+      wrap.appendChild(img);
+    }
+    if ((wrap.dataset.deco || '') === (url || '')) return;
+    wrap.dataset.deco = url || '';
+    wrap.querySelectorAll('.deco-layer').forEach(e => e.remove());
+    if (url) wrap.appendChild(media(url, 'deco-layer'));
+  }
+
+  function decoFor(uid) {
+    const c = window.__chat;
+    const me = auth.currentUser;
+    if (me && uid === me.uid) return (c && c.profile.avatarDecoration) || '';
+    const p = (window._presenceSnap || {})[uid];
+    return (p && p.avatarDecoration) || '';
+  }
+
+  function decorateAvatars() {
+    const c = window.__chat;
+    if (!c) return;
+    decorateImg(document.getElementById('my-avatar'), c.profile.avatarDecoration || '');
+    document.querySelectorAll('#messages .message').forEach(m => {
+      decorateImg(m.querySelector('img.msg-avatar'), decoFor(m.dataset.uid));
+    });
+    document.querySelectorAll('#online-users .user-item').forEach(u => {
+      decorateImg(u.querySelector('img.user-avatar'), decoFor(u.dataset.uid));
+    });
+  }
+  window.decorateAvatars = decorateAvatars;
+
+  let raf = 0;
+  const schedule = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; decorateAvatars(); }); };
+  const mo = new MutationObserver(schedule);
+  mo.observe(document.getElementById('messages'), { childList: true, subtree: true });
+  mo.observe(document.getElementById('online-users'), { childList: true, subtree: true });
+
+  loadItems();
+  onAuthStateChanged(auth, (user) => { if (user) watchWallet(user.uid); });
+</script>
+
+<script src="/assets/js/chat-spin.js"></script>
+</body>
+</html>
