@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Singularity</title>
+	<link rel="shortcut icon" href="/assets/img/fav.png" type="image/x-icon" id="favicon" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+	<style>
+		html, body {
+			margin: 0;
+			height: 100%;
+			background: #000;
+			overflow: hidden;
+		}
+
+		#boot-screen {
+			position: fixed;
+			inset: 0;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+			background: #000;
+			color: #fff;
+			font-family: 'Share Tech Mono', monospace;
+			transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.5s ease;
+		}
+
+		#boot-screen.unlocking {
+			transform: translateY(-100%);
+			opacity: 0.5;
+			pointer-events: none;
+		}
+
+		#boot-screen::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: rgba(0, 0, 0, 0.45);
+			z-index: 1;
+		}
+
+		#boot-video {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			pointer-events: none;
+		}
+
+		#boot-time {
+			position: relative;
+			z-index: 2;
+			font-size: calc(1.625rem + 4.5vw);
+			font-weight: 300;
+			line-height: 1.2;
+			letter-spacing: 2px;
+			text-shadow: 0 0 20px rgba(181, 123, 255, 0.6), 0 0 40px rgba(124, 45, 255, 0.4);
+		}
+
+		#boot-date {
+			position: relative;
+			z-index: 2;
+			margin-top: 0.5rem;
+			font-size: 1.25rem;
+			letter-spacing: 1px;
+			opacity: 0.75;
+		}
+
+		@media (min-width: 1200px) {
+			#boot-time { font-size: 5rem; }
+		}
+	</style>
+</head>
+<body>
+	<div id="boot-screen">
+		<video id="boot-video" src="/assets/video/backgrounds/boot.mp4" autoplay muted loop playsinline tabindex="-1"></video>
+		<div id="boot-time">--:--</div>
+		<div id="boot-date">Loading...</div>
+	</div>
+
+	<script>
+		
+		try {
+			const t = localStorage.getItem("singularity_cloakTitle");
+			if (t) document.title = t;
+			const i = localStorage.getItem("singularity_cloakIcon");
+			if (i) document.getElementById("favicon").href = i;
+		} catch (e) {}
+
+		const video = document.getElementById("boot-video");
+		video.muted = true;
+		video.play().catch(() => {});
+
+		const timeEl = document.getElementById("boot-time");
+		const dateEl = document.getElementById("boot-date");
+
+		function updateClock() {
+			const now = new Date();
+			timeEl.textContent = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+			dateEl.textContent = now.toLocaleDateString([], { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+		}
+		updateClock();
+		const clock = setInterval(updateClock, 1000);
+
+		let leaving = false;
+		function dismiss() {
+			if (leaving) return;
+			leaving = true;
+			clearInterval(clock);
+			document.removeEventListener("click", dismiss);
+			document.removeEventListener("keydown", dismiss);
+			document.removeEventListener("touchstart", dismiss);
+			
+			try { sessionStorage.setItem("singularity_skip_boot", "1"); } catch (e) {}
+			document.getElementById("boot-screen").classList.add("unlocking");
+			setTimeout(() => { location.href = "/"; }, 700);
+		}
+
+		document.addEventListener("click", dismiss);
+		document.addEventListener("keydown", dismiss);
+		document.addEventListener("touchstart", dismiss);
+	</script>
+</body>
+</html>
