@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "presence": {
+      "$scope": {
+        "$scopeId": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    },
+    "typing": {
+      "$scope": {
+        "$scopeId": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    }
+  }
+}
