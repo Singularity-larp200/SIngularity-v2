@@ -236,11 +236,7 @@ import { Send } from '@lucide/vue';
   .chatMessage::-webkit-scrollbar-thumb:hover{
     background:color-mix(in srgb, var(--sg-accent-light) 58%, transparent);
   }
-  
-  .chatInput:focus{
-    border-color:var(--accent, #c0c0c0);
-    box-shadow:0 0 0 3px color-mix(in srgb, var(--accent, #c0c0c0) 16%, transparent);
-  }
+
 
   .message{
     display:flex;
@@ -294,17 +290,6 @@ import { Send } from '@lucide/vue';
     }
   }
 
-  .chatError{
-    margin:0;
-    color:var(--sg-accent-light);
-    font-size:0.9rem;
-    line-height:1.45;
-  }
-
-  .chatRoomError{
-    margin:12px 0 0;
-    padding:0 clamp(14px, 3vw, 32px);
-  }
 
   .message.user{
     margin-left:auto;
