@@ -1,0 +1,30 @@
+{
+  "name": "singularity",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite --config vite.config.mjs",
+    "build": "npm run typecheck && vite build --config vite.config.mjs",
+    "preview": "vite preview --config vite.config.mjs",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.61.0",
+    "@tsparticles/slim": "^3.9.1",
+    "@tsparticles/vue3": "^3.0.1",
+    "vue": "^3.5.44",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/tsconfig": "^0.9.1",
+    "simple-icons": "^16.36.0",
+    "typescript": "~6.0.0",
+    "vite": "^8.3.5",
+    "vite-plugin-vue-devtools": "^8.1.1",
+    "vue-tsc": "^3.3.13"
+  },
+  "allowScripts": {
+    "@tsparticles/engine@3.9.1": true
+  }
+}
