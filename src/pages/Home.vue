@@ -1,29 +1,149 @@
 <script setup>
+import { siDiscord } from 'simple-icons';
 </script>
 <template>
     <div class="homePage">
+        <a
+            class="discordInvite"
+            href="https://discord.gg/gCVYYC9pt6"
+            target="_blank"
+        >
+            <svg class="discordIcon" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                <path :d="siDiscord.path" />
+            </svg>
+            <span>Discord Server</span>
+        </a>
         <div class="titleArea">
-            <h1 class="siteTitle">Singularity V2</h1>
+            <h1 class="siteTitle">Singularity <span>V2</span></h1>
         </div>
+        <form id="homepageSearchbar" class="homepageSearchbar">
+            <input id="browserAddress" type="text" placeholder="Search the web..." />
+        </form>
     </div>
 </template>
 <style scoped>
-  .homePage{
-    position:relative;
-    display:flex;
-    flex:1;
-    width:100%;
-    box-sizing:border-box;
+  .homePage {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    justify-items: center;
+    gap: 22px;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: center;
   }
-  .titleArea{
-    display:flex;
-    flex:1;
-    align-items:center;
-    justify-content:center;
+
+  .discordInvite {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #5865f2;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(8, 16, 28, 0.28);
   }
+
+  .discordInvite:hover {
+    background: #6b77f7;
+  }
+
+  .discordInvite:focus-visible {
+    outline: 2px solid var(--sg-accent-light);
+    outline-offset: 2px;
+  }
+
+  .discordIcon {
+    display: block;
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  .titleArea {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
   .siteTitle {
+    margin: 0;
+    color: var(--sg-accent-soft);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 600;
+    letter-spacing: 0.15px;
+    transform: translateY(-0.15em);
+  }
+
+  .siteTitle span {
+    font-weight: 700;
+    background-size: 200% 200%;
+    background-position: 0% 0%;
+    background-image: repeating-linear-gradient(
+      135deg,
+      var(--sg-accent-soft) 0%,
+      var(--sg-accent) 25%,
+      var(--sg-accent-soft) 50%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientMove 6s linear infinite;
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--sg-accent) 60%, transparent));
+  }
+
+  
+  @keyframes gradientMove {
+    0% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+
+  .homepageSearchbar {
+    display: grid;
+    justify-items: center;
+    width: min(640px, 92%);
+  }
+
+  .homepageSearchbar input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 60px;
+    padding: 0 22px;
+    border: 1px solid var(--sg-border);
+    border-radius: 16px;
+    background: var(--sg-surface-raised);
     color: var(--sg-text);
-    font-size: 4rem;
-    transform: translateY(-160%);
+    font-size: clamp(16px, 1.4vw, 19px);
+    text-align: center;
+    outline: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  }
+
+  .homepageSearchbar input::placeholder {
+    color: var(--sg-text-muted);
+  }
+
+  .homepageSearchbar input:focus {
+    border-color: var(--sg-accent);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--sg-accent) 28%, transparent),
+      0 6px 16px rgba(0, 0, 0, 0.22);
   }
 </style>
