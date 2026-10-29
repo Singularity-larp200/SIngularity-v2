@@ -50,6 +50,7 @@ import { siDiscord } from 'simple-icons';
     letter-spacing: 0.2px;
     text-decoration: none;
     box-shadow: 0 6px 16px rgba(8, 16, 28, 0.28);
+    animation: fadeIn 200ms ease-out 400ms both;
   }
 
   .discordInvite:hover {
@@ -73,6 +74,7 @@ import { siDiscord } from 'simple-icons';
     display: flex;
     justify-content: center;
     width: 100%;
+    animation: fadeIn 200ms ease-out both;
   }
 
   .siteTitle {
@@ -111,10 +113,21 @@ import { siDiscord } from 'simple-icons';
     }
   }
 
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
   .homepageSearchbar {
     display: grid;
     justify-items: center;
     width: min(640px, 92%);
+    animation: fadeIn 200ms ease-out 200ms both;
   }
 
   .homepageSearchbar input {
@@ -141,5 +154,14 @@ import { siDiscord } from 'simple-icons';
     box-shadow:
       0 0 0 3px color-mix(in srgb, var(--sg-accent) 28%, transparent),
       0 6px 16px rgba(0, 0, 0, 0.22);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .titleArea,
+    .homepageSearchbar,
+    .discordInvite,
+    .siteTitle span {
+      animation: none;
+    }
   }
 </style>

@@ -112,6 +112,7 @@ import { Send } from '@lucide/vue';
     width:100%;
     box-sizing:border-box;
     padding:0 clamp(14px, 3vw, 32px) 20px;
+    animation: fadeIn 200ms ease-out 200ms both;
   }
    .chatMessageInput{
     flex:1;
@@ -204,6 +205,7 @@ import { Send } from '@lucide/vue';
     background:var(--sg-surface);
     box-shadow:0 18px 48px var(--sg-shadow-strong);
     color:var(--sg-text);
+    animation: fadeIn 200ms ease-out 400ms both;
   }
    .chatJoinPanel{
     position:absolute;
@@ -225,6 +227,7 @@ import { Send } from '@lucide/vue';
     padding:24px clamp(14px, 3vw, 32px);
     scrollbar-color:color-mix(in srgb, var(--sg-accent-soft) 42%, transparent) transparent;
     scrollbar-width:thin;
+    animation: fadeIn 200ms ease-out both;
   }
   .chatMessage::-webkit-scrollbar{
     width:8px;
@@ -336,5 +339,23 @@ import { Send } from '@lucide/vue';
   .chatSendButton:disabled{
     cursor:not-allowed;
     opacity:0.55;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chatMessage,
+    .chatInputArea,
+    .chatJoinCard {
+      animation: none;
+    }
   }
 </style>
