@@ -3,6 +3,12 @@ import { siDiscord } from 'simple-icons';
 </script>
 <template>
     <div class="homePage">
+        <div class="titleArea">
+            <h1 class="siteTitle">Singularity <span>V2</span></h1>
+        </div>
+        <form id="homepageSearchbar" class="homepageSearchbar">
+            <input id="browserAddress" type="text" placeholder="Search the web..." />
+        </form>
         <a
             class="discordInvite"
             href="https://discord.gg/gCVYYC9pt6"
@@ -13,12 +19,6 @@ import { siDiscord } from 'simple-icons';
             </svg>
             <span>Discord Server</span>
         </a>
-        <div class="titleArea">
-            <h1 class="siteTitle">Singularity <span>V2</span></h1>
-        </div>
-        <form id="homepageSearchbar" class="homepageSearchbar">
-            <input id="browserAddress" type="text" placeholder="Search the web..." />
-        </form>
     </div>
 </template>
 <style scoped>
@@ -37,10 +37,6 @@ import { siDiscord } from 'simple-icons';
   }
 
   .discordInvite {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    z-index: 1;
     display: inline-flex;
     align-items: center;
     gap: 8px;
