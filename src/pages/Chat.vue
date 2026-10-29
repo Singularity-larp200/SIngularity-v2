@@ -14,12 +14,10 @@ import { Send } from '@lucide/vue';
                     name="message"
                     type="text"
                     maxlength="500"
-                    placeholder="Write a message..."
-                    autocomplete="off"
+                    placeholder="Send a message..."
                     required
-                    disabled
                 >
-                <button class="chatSendButton" id="chatSendButton" type="button" aria-label="Send message" disabled>
+                <button class="chatSendButton" id="chatSendButton" type="button" aria-label="Send message">
                     <Send class="sendIcon"/>
                 </button>
             </div>
@@ -171,7 +169,7 @@ import { Send } from '@lucide/vue';
     color:var(--sg-accent-soft);
     font-size:1.1rem;
     cursor:pointer;
-    transition:all 0.2s
+    transition:all 0.2s;
   }
   
   .chatSendButton .sendIcon{
@@ -291,6 +289,7 @@ import { Send } from '@lucide/vue';
       gap:8px;
       padding:0 10px 12px;
     }
+
   }
 
 

@@ -23,9 +23,9 @@ import { RouterLink } from 'vue-router';
         <House />
       </RouterLink>
 
-      <button type="button" class="sg-rail-btn" aria-label="Games">
+      <RouterLink to="/games" exact-active-class="active" class="sg-rail-btn" aria-label="Games">
         <GamepadDirectional />
-      </button>
+      </RouterLink>
 
       <button type="button" class="sg-rail-btn" aria-label="Browser">
         <Globe />
@@ -41,9 +41,9 @@ import { RouterLink } from 'vue-router';
          <MessageSquare />
       </RouterLink>
 
-      <button type="button" class="sg-rail-btn" aria-label="AI">
+      <RouterLink to="/ai" class="sg-rail-btn" exact-active-class="active" aria-label="AI">
         <Bot />
-      </button>
+      </RouterLink>
     </div>
 
     <div class="sg-rail-bottom">

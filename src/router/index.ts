@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Chat from '@/pages/Chat.vue'
 import Home from '@/pages/Home.vue'
 
 const router = createRouter({
@@ -11,10 +10,20 @@ const router = createRouter({
       component: Home,
     },
     {
+      path: '/games',
+      name: 'games',
+      component: () => import('@/pages/Games.vue'),
+    },
+    {
       path: '/chat',
       name: 'chat',
-      component: Chat,
+      component: () => import('@/pages/Chat.vue'),
     },
+    {
+      path: '/ai',
+      name: 'ai',
+      component: () => import('@/pages/AI.vue'),
+    }
   ],
 })
 
