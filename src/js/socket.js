@@ -72,7 +72,7 @@ export function initializeChatSocket() {
   }
 
   function showConnectionError(message) {
-    if (state.joined) {
+    if (joinPanel.hidden) {
       showRoomError(message);
     } else {
       showJoinError(message);
@@ -223,14 +223,8 @@ export function initializeChatSocket() {
   }
 
   function getChatBackendUrl() {
-    if (
-      window.location.hostname === "localhost"
-      || window.location.hostname === "127.0.0.1"
-    ) {
-      return PRODUCTION_CHAT_BACKEND_URL;
-    }
     if (window.__AURELIUM_CANONICAL_URL) return window.__AURELIUM_CANONICAL_URL;
-    return window.location.href;
+    return PRODUCTION_CHAT_BACKEND_URL;
   }
 
   function connect() {
@@ -251,6 +245,8 @@ export function initializeChatSocket() {
 
     socket.addEventListener("open", function() {
       if (state.socket !== socket || !state.active) return;
+      showJoinError("");
+      showRoomError("");
       if (state.displayName) {
         sendJoin(socket, state.displayName);
       } else {
@@ -305,6 +301,7 @@ export function initializeChatSocket() {
     socket.addEventListener("close", function() {
       if (state.socket !== socket || !state.active) return;
       state.socket = null;
+      showConnectionError("Chat connection lost. Retrying...");
       state.joined = false;
       setSendEnabled(false);
       state.reconnectTimer = setTimeout(function() {

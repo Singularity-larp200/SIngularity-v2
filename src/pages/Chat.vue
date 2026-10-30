@@ -19,6 +19,7 @@ onUnmounted(() => {
             <div class="chatMessage" id="chatMessages" role="log" aria-live="polite">
                 <p class="chatEmpty" id="chatEmpty">no messages yet, say hi.</p>
             </div>
+            <p class="chatError roomError" id="chatRoomError" role="alert" hidden></p>
             <form class="chatInputArea" id="chatMessageForm" hidden>
                 <input
                     class="chatMessageInput"
@@ -89,6 +90,10 @@ onUnmounted(() => {
     min-height:0;
     width:100%;
     color:var(--sg-text);
+  }
+  .chatError{
+    color:var(--sg-text-muted);
+    font-size:0.85rem;
   }
   .chatJoinPanel[hidden],
   .chatInputArea[hidden]{
