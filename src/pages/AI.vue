@@ -10,7 +10,7 @@ import { Send } from '@lucide/vue';
         id="aiMessage"
         name="message"
         type="text"
-        placeholder="Write to the agent..."
+        placeholder="Type Here..."
         required
       >
       <button class="sendBtn" id="aiSendButton" type="button" aria-label="Send message">
