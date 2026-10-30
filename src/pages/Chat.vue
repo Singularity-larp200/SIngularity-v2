@@ -1,13 +1,25 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue';
 import { Send } from '@lucide/vue';
+import { initializeChatSocket } from '@/js/socket.js';
+
+let cleanupChatSocket: (() => void) | undefined;
+
+onMounted(() => {
+    cleanupChatSocket = initializeChatSocket();
+});
+
+onUnmounted(() => {
+    cleanupChatSocket?.();
+});
 </script>
 <template>
-    <div class="chatPage">
+    <div class="chatPage" data-chat-root>
         <section class="chatRoom" id="chatRoom" inert>
             <div class="chatMessage" id="chatMessages" role="log" aria-live="polite">
-                <p class="chatEmpty" id="chatEmpty">no messages yet</p>
+                <p class="chatEmpty" id="chatEmpty">no messages yet, say hi.</p>
             </div>
-            <div class="chatInputArea" id="chatInputArea">
+            <form class="chatInputArea" id="chatMessageForm" hidden>
                 <input
                     class="chatMessageInput"
                     id="chatMessage"
@@ -17,16 +29,16 @@ import { Send } from '@lucide/vue';
                     placeholder="Send a message..."
                     required
                 >
-                <button class="chatSendButton" id="chatSendButton" type="button" aria-label="Send message">
+                <button class="chatSendButton" id="chatSendButton" type="submit" aria-label="Send message">
                     <Send class="sendIcon"/>
                 </button>
-            </div>
+            </form>
         </section>
         <section class="chatJoinPanel" id="chatJoinPanel">
             <div class="chatJoinCard">
                 <h1 class="joinCardTitle" id="joinCardTitle">Join the Chat</h1>
                 <p class="joinCardSubtitle">Make a username to chat</p>
-                <div class="joinForm" id="joinForm">
+                <form class="joinForm" id="chatJoinForm">
                     <span class="joinCardUsername" id="usernameText">Username</span>
                     <input
                         class="joinCardInput"
@@ -40,8 +52,9 @@ import { Send } from '@lucide/vue';
                         required
                         autofocus
                     >
-                    <button class="chatJoinButton" id="chatJoinButton" type="button">Continue</button>
-                </div>
+                    <p class="chatError joinError" id="chatJoinError" role="alert"></p>
+                    <button class="chatJoinButton" id="chatJoinButton" type="submit">Continue</button>
+                </form>
             </div>
         </section>
     </div>
@@ -77,7 +90,11 @@ import { Send } from '@lucide/vue';
     width:100%;
     color:var(--sg-text);
   }
-  .chatEmpty{
+  .chatJoinPanel[hidden],
+  .chatInputArea[hidden]{
+    display:none;
+  }
+  :deep(.chatEmpty){
     margin:auto;
     color:var(--sg-text-muted);
     text-align:center;
@@ -239,14 +256,14 @@ import { Send } from '@lucide/vue';
   }
 
 
-  .message{
+  :deep(.message){
     display:flex;
     gap:12px;
     align-items:flex-end;
     max-width:min(78%, 760px);
   }
   
-  .messageBubble{
+  :deep(.messageBubble){
     width:fit-content;
     max-width:100%;
     padding:12px 16px;
@@ -280,7 +297,7 @@ import { Send } from '@lucide/vue';
       padding:16px 10px;
     }
     
-    .messageBubble{
+    :deep(.messageBubble){
       padding:10px 14px;
       font-size:0.95rem;
     }
@@ -293,20 +310,20 @@ import { Send } from '@lucide/vue';
   }
 
 
-  .message.user{
+  :deep(.message.user){
     margin-left:auto;
   }
 
-  .message.bot{
+  :deep(.message.bot){
     margin-right:auto;
   }
 
-  .messageContent{
+  :deep(.messageContent){
     min-width:0;
     max-width:100%;
   }
 
-  .messageMeta{
+  :deep(.messageMeta){
     display:flex;
     align-items:baseline;
     gap:8px;
@@ -315,24 +332,26 @@ import { Send } from '@lucide/vue';
     font-size:0.78rem;
   }
 
-  .messageName{
-    color:var(--sg-accent-light);
+  :deep(.messageName){
+    color:var(--sg-text-muted);
     font-weight:600;
   }
 
-  .messageTime{
+  :deep(.messageTime){
     color:var(--sg-text-muted);
     font-size:0.75rem;
   }
 
-  .message.user .messageMeta{
+  :deep(.messageSeparator){
+    color:var(--sg-text-muted);
+  }
+
+  :deep(.message.user .messageMeta){
     justify-content:flex-end;
   }
 
-  .message.user .messageBubble{
+  :deep(.message.user .messageBubble){
     margin-left:auto;
-    border-color:var(--sg-accent);
-    background:var(--sg-accent);
   }
 
   .chatSendButton:disabled{
