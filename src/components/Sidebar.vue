@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { GamepadDirectional } from '@lucide/vue';
 import { House } from '@lucide/vue';
