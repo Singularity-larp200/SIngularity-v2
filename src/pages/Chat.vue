@@ -153,6 +153,10 @@ onUnmounted(() => {
     line-height:26px;
   }
 
+  .chatMessageInput:focus{
+    outline:none;
+  }
+
   .chatMessageInput::placeholder{
     color:var(--sg-text-muted);
     opacity:1;
